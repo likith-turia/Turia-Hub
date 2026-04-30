@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Turia — Quotation</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg2: #f7f7f5;
+    --text: #1a1a1a;
+    --text2: #555550;
+    --text3: #888880;
+    --border: rgba(0,0,0,0.1);
+    --border2: rgba(0,0,0,0.18);
+    --purple-bg: #EEEDFE;
+    --purple-mid: #7F77DD;
+    --purple-dark: #3C3489;
+    --purple-border: #AFA9EC;
+    --teal-bg: #E1F5EE;
+    --teal-dark: #085041;
+    --teal-mid: #0F6E56;
+    --amber-bg: #FAEEDA;
+    --amber-dark: #633806;
+    --amber-mid: #B45309;
+    --green-bg: #EAF3DE;
+    --green-dark: #27500A;
+    --green-mid: #3D7A10;
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg2);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ══ CONTROLS ══ */
+  .controls {
+    background: var(--bg);
+    border-bottom: 0.5px solid var(--border2);
+    padding: 13px 20px;
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .ctrl-logo { font-size: 15px; font-weight: 700; color: var(--purple-dark); display: flex; align-items: center; gap: 5px; margin-right: 8px; padding-bottom: 2px; }
+  .ctrl-logo .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--purple-mid); }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; }
+  .field input { font-family: inherit; font-size: 13px; font-weight: 500; color: var(--text); background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 6px 10px; outline: none; width: 150px; transition: border-color 0.15s; }
+  .field input.w-sm { width: 80px; }
+  .field input.w-lg { width: 200px; }
+  .field input:focus { border-color: var(--purple-mid); background: var(--bg); }
+  .field select { font-family:inherit; font-size:13px; font-weight:500; color:var(--text); background:var(--bg2); border:1px solid var(--border2); border-radius:var(--radius); padding:6px 10px; outline:none; cursor:pointer; appearance:auto; }
+  .field select:focus { border-color: var(--purple-mid); background: var(--bg); }
+  .toggle-wrap { display: flex; align-items: center; gap: 7px; cursor: pointer; padding-bottom: 2px; user-select: none; }
+  .toggle-wrap span { font-size: 12px; font-weight: 500; color: var(--text2); }
+  .tog { width: 34px; height: 19px; background: var(--border2); border-radius: 10px; position: relative; transition: background 0.2s; flex-shrink: 0; }
+  .tog.on { background: var(--amber-mid); }
+  .tog::after { content: ''; position: absolute; width: 13px; height: 13px; background: white; border-radius: 50%; top: 3px; left: 3px; transition: left 0.18s; box-shadow: 0 1px 3px rgba(0,0,0,0.25); }
+  .tog.on::after { left: 18px; }
+  .btn-print { font-family: inherit; font-size: 13px; font-weight: 600; color: white; background: var(--purple-mid); border: none; border-radius: var(--radius); padding: 7px 16px; cursor: pointer; transition: background 0.15s; }
+  .btn-print:hover { background: var(--purple-dark); }
+
+  /* ══ PAGE ══ */
+  .page { max-width: 900px; margin: 24px auto 48px; padding: 0 16px; }
+
+  .quote { background: var(--bg); border-radius: var(--radius-lg); border: 0.5px solid var(--border2); overflow: hidden; }
+
+  /* Header */
+  .q-header { background: var(--purple-dark); padding: 20px 28px 16px; display: flex; justify-content: space-between; align-items: center; }
+  .q-brand-logo { height: 30px; display: block; }
+  .q-brand-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+  .q-date { font-size: 12px; color: rgba(255,255,255,0.5); text-align: right; }
+  .q-date { font-size: 12px; color: rgba(255,255,255,0.5); text-align: right; }
+
+  /* To bar */
+  .q-to { background: var(--purple-bg); border-bottom: 1px solid var(--purple-border); padding: 14px 28px; display: flex; gap: 36px; flex-wrap: wrap; align-items: flex-start; }
+  .q-to-block { display: flex; flex-direction: column; gap: 1px; }
+  .q-to-lbl { font-size: 10px; font-weight: 700; color: var(--purple-mid); text-transform: uppercase; letter-spacing: 0.1em; }
+  .q-to-val { font-size: 13px; font-weight: 600; color: var(--purple-dark); }
+  .q-to-sub { font-size: 11px; color: var(--text2); }
+
+  /* Body */
+  .q-body { padding: 20px 28px; }
+  .q-section-lbl { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 14px; }
+
+  /* ══ TWO PLAN CARDS SIDE BY SIDE ══ */
+  .plans-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .plan-card {
+    border-radius: var(--radius-lg);
+    border: 1.5px solid var(--border);
+    overflow: hidden;
+  }
+
+  .plan-card.growth {
+    border-color: var(--purple-border);
+    box-shadow: 0 0 0 3px var(--purple-bg);
+  }
+
+  /* Plan header — name + tagline */
+  .plan-head {
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .plan-card.starter .plan-head { background: var(--bg2); }
+  .plan-card.growth  .plan-head { background: var(--purple-bg); border-bottom-color: var(--purple-border); }
+
+  .plan-badge { display: inline-flex; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; padding: 2px 8px; border-radius: 20px; margin-bottom: 6px; }
+  .plan-card.starter .plan-badge { background: var(--teal-bg); color: var(--teal-dark); }
+  .plan-card.growth  .plan-badge { background: var(--purple-mid); color: white; }
+
+  .plan-name { font-size: 17px; font-weight: 700; letter-spacing: -0.2px; }
+  .plan-card.starter .plan-name { color: var(--text); }
+  .plan-card.growth  .plan-name { color: var(--purple-dark); }
+  .plan-tagline { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  /* ── BILLING OPTIONS: two mini-cards inside ── */
+  .billing-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .billing-opt {
+    padding: 14px 16px;
+    position: relative;
+  }
+
+  .billing-opt + .billing-opt {
+    border-left: 1px solid var(--border);
+  }
+
+  /* Annual gets light tint */
+  .plan-card.starter .billing-opt.annual { background: #f5fbf8; }
+  .plan-card.growth  .billing-opt.annual { background: var(--purple-bg); }
+
+  .bill-type-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .bill-type {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text3);
+  }
+
+  .billing-opt.annual .bill-type { color: var(--text2); }
+
+  .rec-tag {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .plan-card.starter .rec-tag { background: var(--green-bg); color: var(--green-dark); }
+  .plan-card.growth  .rec-tag { background: var(--purple-mid); color: white; }
+
+  /* Price inside billing opt */
+  .price-line { display: flex; align-items: baseline; gap: 2px; margin-bottom: 2px; }
+  .p-sym { font-size: 13px; font-weight: 700; position: relative; top: -3px; }
+  .p-num { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+  .p-cross { font-size: 12px; color: var(--text3); text-decoration: line-through; margin-left: 4px; align-self: center; }
+
+  /* monthly: neutral colour */
+  .billing-opt.monthly .p-sym,
+  .billing-opt.monthly .p-num { color: var(--text2); }
+
+  /* annual: plan colour */
+  .plan-card.starter .billing-opt.annual .p-sym,
+  .plan-card.starter .billing-opt.annual .p-num { color: var(--teal-dark); }
+  .plan-card.growth  .billing-opt.annual .p-sym,
+  .plan-card.growth  .billing-opt.annual .p-num { color: var(--purple-dark); }
+
+  .p-sub { font-size: 10.5px; color: var(--text3); margin-bottom: 10px; }
+
+  /* Breakdown mini-table */
+  .mini-table { display: flex; flex-direction: column; gap: 4px; }
+  .mrow { display: flex; justify-content: space-between; font-size: 11.5px; }
+  .mrow .ml { color: var(--text2); }
+  .mrow .mr { font-weight: 600; color: var(--text); }
+  .mdiv { height: 1px; background: var(--border); margin: 3px 0; }
+  .mrow.tot .ml { font-weight: 700; color: var(--text); font-size: 12px; }
+  .mrow.tot .mr { font-size: 13px; font-weight: 800; }
+  .plan-card.starter .billing-opt.annual .mrow.tot .mr { color: var(--teal-dark); }
+  .plan-card.growth  .billing-opt.annual .mrow.tot .mr { color: var(--purple-dark); }
+
+  .save-pill {
+    display: inline-flex;
+    font-size: 10px; font-weight: 600;
+    padding: 3px 8px; border-radius: 20px;
+    background: var(--green-bg); color: var(--green-dark);
+    margin-top: 7px;
+  }
+
+  /* ── FEATURES: single row at the bottom of each plan card ── */
+  .plan-feats {
+    padding: 12px 18px;
+  }
+
+  .feats-lbl {
+    font-size: 10px; font-weight: 700; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
+  }
+
+  .feats-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px 12px;
+  }
+
+  .feats-cols li {
+    list-style: none;
+    font-size: 11.5px; color: var(--text2);
+    display: flex; align-items: flex-start; gap: 5px; line-height: 1.4;
+  }
+
+  .fc {
+    flex-shrink: 0; width: 13px; height: 13px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; margin-top: 1px;
+  }
+  .plan-card.starter .fc { background: var(--teal-bg);   color: var(--teal-mid); }
+  .plan-card.growth  .fc { background: var(--purple-bg); color: var(--purple-mid); }
+
+  /* Notice */
+  .notice { border: 1.5px dashed var(--amber-mid); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 14px; }
+  .notice-top { background: var(--amber-bg); padding: 10px 18px; border-bottom: 1px solid rgba(180,83,9,0.15); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .notice-badge { font-size: 10px; font-weight: 700; color: var(--amber-mid); text-transform: uppercase; letter-spacing: 0.08em; }
+  .notice-title { font-size: 13px; font-weight: 700; color: var(--amber-dark); margin-top: 1px; }
+  .notice-sub { font-size: 11px; color: var(--text2); }
+  .notice-price { font-size: 18px; font-weight: 800; color: var(--amber-dark); }
+  .notice-credits { font-size: 11px; color: var(--text3); }
+  .notice-body { padding: 9px 18px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .nf { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
+  .nf-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--amber-mid); flex-shrink: 0; }
+
+  /* Trial */
+  .trial { background: var(--teal-bg); border: 1px solid rgba(15,110,86,0.2); border-radius: var(--radius); padding: 10px 16px; display: flex; align-items: center; gap: 10px; }
+  .trial-icon { width: 26px; height: 26px; border-radius: 50%; background: var(--teal-mid); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+  .trial-title { font-size: 12px; font-weight: 700; color: var(--teal-dark); }
+  .trial-sub { font-size: 11px; color: var(--teal-mid); }
+
+  /* Footer */
+  .q-footer { border-top: 1px solid var(--border); padding: 13px 28px; background: var(--bg2); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  .qf-contact { display: flex; flex-direction: column; gap: 1px; }
+  .qf-lbl { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; }
+  .qf-val { font-size: 12px; font-weight: 500; color: var(--text2); }
+  .qf-brand { font-size: 12px; color: var(--text3); text-align: right; line-height: 1.6; }
+  .qf-brand strong { color: var(--purple-mid); font-weight: 700; }
+
+  /* Print */
+  .print-tip-bar {
+    background: #FAEEDA;
+    border-bottom: 1px solid #f5d9a8;
+    padding: 8px 20px;
+    font-size: 12px;
+    color: #633806;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  @page {
+    margin: 0.5cm 0.5cm;
+    size: A4 portrait;
+  }
+
+  @media print {
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+    }
+
+    .controls, .print-tip-bar { display: none !important; }
+
+    body {
+      background: white;
+      margin: 0;
+      padding: 0;
+      font-size: 12px;
+      -webkit-text-size-adjust: none;
+    }
+
+    .page {
+      margin: 0;
+      padding: 0;
+      max-width: 100%;
+    }
+
+    .quote {
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+    }
+
+    .plan-card.growth { box-shadow: none; }
+
+    /* Header */
+    .q-header { padding: 14px 20px 12px; }
+    .q-brand-logo { height: 24px; }
+    .q-brand-sub { font-size: 10px; }
+    .q-date { font-size: 10px; }
+
+    /* To bar */
+    .q-to { padding: 10px 20px; gap: 28px; }
+    .q-to-lbl { font-size: 9px; }
+    .q-to-val { font-size: 12px; }
+    .q-to-sub { font-size: 10px; }
+
+    /* Body */
+    .q-body { padding: 14px 20px; }
+    .q-section-lbl { font-size: 9px; margin-bottom: 10px; }
+
+    /* Plan cards */
+    .plans-row { gap: 10px; margin-bottom: 10px; }
+
+    .plan-head { padding: 10px 14px 8px; }
+    .plan-badge { font-size: 9px; padding: 2px 7px; margin-bottom: 4px; }
+    .plan-name { font-size: 15px; }
+    .plan-tagline { font-size: 10px; }
+
+    /* Billing cols */
+    .billing-opt { padding: 10px 12px; }
+    .bill-type { font-size: 9px; }
+    .bill-type-row { margin-bottom: 7px; }
+    .rec-tag { font-size: 8px; padding: 1px 5px; }
+
+    .p-sym { font-size: 12px; top: -3px; }
+    .p-num { font-size: 22px; }
+    .p-cross { font-size: 10px; }
+    .p-sub { font-size: 10px; margin-bottom: 8px; }
+
+    .mini-table { gap: 4px; }
+    .mrow { font-size: 11px; }
+    .mrow.tot .ml { font-size: 11px; }
+    .mrow.tot .mr { font-size: 12px; }
+    .mdiv { margin: 2px 0; }
+
+    .save-pill { font-size: 9px; padding: 2px 7px; margin-top: 5px; }
+
+    /* Features */
+    .plan-feats { padding: 10px 14px; }
+    .feats-lbl { font-size: 9px; margin-bottom: 5px; }
+    .feats-cols { gap: 3px 10px; }
+    .feats-cols li { font-size: 10.5px; }
+    .fc { width: 12px; height: 12px; font-size: 7px; }
+
+    /* Notice */
+    .notice { margin-bottom: 10px; }
+    .notice-top { padding: 8px 16px; }
+    .notice-badge { font-size: 9px; }
+    .notice-title { font-size: 12px; }
+    .notice-sub { font-size: 10px; }
+    .notice-price { font-size: 16px; }
+    .notice-credits { font-size: 10px; }
+    .notice-body { padding: 7px 16px; gap: 10px; }
+    .nf { font-size: 10px; }
+
+    /* Trial */
+    .trial { padding: 8px 14px; gap: 8px; margin-bottom: 0; }
+    .trial-icon { width: 22px; height: 22px; font-size: 11px; }
+    .trial-title { font-size: 11px; }
+    .trial-sub { font-size: 10px; }
+
+    /* Footer */
+    .q-footer { padding: 10px 20px; gap: 6px; }
+    .qf-lbl { font-size: 9px; }
+    .qf-val { font-size: 11px; }
+    .qf-brand { font-size: 11px; }
+  }
+
+</style>
+</head>
+<body>
+
+<!-- CONTROLS -->
+<div class="controls">
+  <div class="ctrl-logo"><div class="dot"></div> Turia Quotes</div>
+  <div class="field">
+    <label>Contact Person Name</label>
+    <input type="text" id="contact" class="w-lg" placeholder="e.g. CA Ravi Sharma" oninput="update()">
+  </div>
+  <div class="field">
+    <label>No. of Users</label>
+    <input type="number" id="users" class="w-sm" value="7" min="1" max="999" oninput="update()">
+  </div>
+  <div class="field">
+    <label>Turia Rep</label>
+    <select id="rep" onchange="update()" style="width:160px">
+      <option value="">— Select —</option>
+      <option value="Kavin Raj|+91 84310 18842|kavin.raj@turia.in">Kavin Raj</option>
+      <option value="Milton|+91 96321 36980|milton@turia.in">Milton</option>
+      <option value="Likith S|+91 97423 41894|likith@turia.in">Likith S</option>
+    </select>
+  </div>
+  <div class="toggle-wrap" onclick="toggleNotice()">
+    <div class="tog" id="ntog"></div>
+    <span>+ Notice Add-on</span>
+  </div>
+  <button class="btn-print" onclick="printQuote()">🖨 Save as PDF</button>
+</div>
+
+<!-- QUOTE PAGE -->
+<div class="print-tip-bar">
+  <span>💡 When saving as PDF: in Chrome print dialog → <strong>More settings</strong> → uncheck <strong>"Headers and footers"</strong> → Save as PDF</span>
+</div>
+<div class="page">
+<div class="quote">
+
+  <div class="q-header">
+    <div>
+      <img src="data:image/png;base64,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" class="q-brand-logo" alt="Turia">
+      <div class="q-brand-sub">Practice Management Software for CA Firms</div>
+    </div>
+    <div class="q-date" id="q-date">—</div>
+  </div>
+
+  <div class="q-to">
+    <div class="q-to-block">
+      <div class="q-to-lbl">Prepared for</div>
+      <div class="q-to-val" id="d-contact">—</div>
+    </div>
+    <div class="q-to-block">
+      <div class="q-to-lbl">Users</div>
+      <div class="q-to-val" id="d-users">7 users</div>
+    </div>
+    <div class="q-to-block">
+      <div class="q-to-lbl">Free Trial</div>
+      <div class="q-to-val">15 days</div>
+      <div class="q-to-sub">No credit card needed</div>
+    </div>
+  </div>
+
+  <div class="q-body">
+
+    <div class="q-section-lbl">Choose your plan &amp; billing cycle</div>
+
+    <div class="plans-row">
+
+      <!-- ══ STARTER ══ -->
+      <div class="plan-card starter">
+
+        <div class="plan-head">
+          <div class="plan-badge">Starter</div>
+          <div class="plan-name">Starter</div>
+          <div class="plan-tagline">Perfect for small CA firms getting started</div>
+        </div>
+
+        <div class="billing-row">
+
+          <!-- Monthly -->
+          <div class="billing-opt monthly">
+            <div class="bill-type-row">
+              <span class="bill-type">Monthly</span>
+            </div>
+            <div class="price-line">
+              <span class="p-sym">₹</span>
+              <span class="p-num">100</span>
+            </div>
+            <div class="p-sub">per user / month</div>
+            <div class="mini-table">
+              <div class="mrow"><span class="ml">Users</span><span class="mr" id="sm-u">7</span></div>
+              <div class="mdiv"></div>
+              <div class="mrow tot"><span class="ml">Monthly total</span><span class="mr" id="sm-tot">₹700</span></div>
+            </div>
+          </div>
+
+          <!-- Annual -->
+          <div class="billing-opt annual">
+            <div class="bill-type-row">
+              <span class="bill-type">Annual</span>
+              <span class="rec-tag">Recommended</span>
+            </div>
+            <div class="price-line">
+              <span class="p-sym">₹</span>
+              <span class="p-num" id="sa-eff">86</span>
+              <span class="p-cross">₹100</span>
+            </div>
+            <div class="p-sub">effective per user / month</div>
+            <div class="mini-table">
+              <div class="mrow"><span class="ml">Users</span><span class="mr" id="sa-u">7</span></div>
+              <div class="mrow"><span class="ml">Pay (12 months)</span><span class="mr" id="sa-pay">₹8,400</span></div>
+              <div class="mrow"><span class="ml">Get</span><span class="mr">14 months</span></div>
+              <div class="mdiv"></div>
+              <div class="mrow tot"><span class="ml">Annual total</span><span class="mr" id="sa-tot">₹8,400</span></div>
+            </div>
+            <div class="save-pill" id="sa-save">✓ Save ₹1,400 (2 months free)</div>
+          </div>
+
+        </div><!-- /billing-row -->
+
+        <!-- Features — shown ONCE -->
+        <div class="plan-feats">
+          <div class="feats-lbl">What's included</div>
+          <ul class="feats-cols">
+            <li><span class="fc">✓</span>Dashboards</li>
+            <li><span class="fc">✓</span>Client Management</li>
+            <li><span class="fc">✓</span>Tasks &amp; Recurring Tasks</li>
+            <li><span class="fc">✓</span>Invoice &amp; Billing</li>
+            <li><span class="fc">✓</span>Service Management</li>
+            <li><span class="fc">✓</span>DSC Register</li>
+            <li><span class="fc">✓</span>Licenses · Passwords</li>
+            <li><span class="fc">✓</span>Doc In-Out</li>
+            <li><span class="fc">✓</span>Attendance &amp; Leave</li>
+            <li><span class="fc">✓</span>Leads Management</li>
+            <li><span class="fc">✓</span>5 GB Storage</li>
+          </ul>
+        </div>
+
+      </div><!-- /starter -->
+
+      <!-- ══ GROWTH ══ -->
+      <div class="plan-card growth">
+
+        <div class="plan-head">
+          <div class="plan-badge">⭐ 80% choose this</div>
+          <div class="plan-name">Growth</div>
+          <div class="plan-tagline">Best for growing CA practices</div>
+        </div>
+
+        <div class="billing-row">
+
+          <!-- Monthly -->
+          <div class="billing-opt monthly">
+            <div class="bill-type-row">
+              <span class="bill-type">Monthly</span>
+            </div>
+            <div class="price-line">
+              <span class="p-sym">₹</span>
+              <span class="p-num">200</span>
+            </div>
+            <div class="p-sub">per user / month</div>
+            <div class="mini-table">
+              <div class="mrow"><span class="ml">Users</span><span class="mr" id="gm-u">7</span></div>
+              <div class="mdiv"></div>
+              <div class="mrow tot"><span class="ml">Monthly total</span><span class="mr" id="gm-tot">₹1,400</span></div>
+            </div>
+          </div>
+
+          <!-- Annual -->
+          <div class="billing-opt annual">
+            <div class="bill-type-row">
+              <span class="bill-type">Annual</span>
+              <span class="rec-tag">Recommended</span>
+            </div>
+            <div class="price-line">
+              <span class="p-sym">₹</span>
+              <span class="p-num" id="ga-eff">171</span>
+              <span class="p-cross">₹200</span>
+            </div>
+            <div class="p-sub">effective per user / month</div>
+            <div class="mini-table">
+              <div class="mrow"><span class="ml">Users</span><span class="mr" id="ga-u">7</span></div>
+              <div class="mrow"><span class="ml">Pay (12 months)</span><span class="mr" id="ga-pay">₹16,800</span></div>
+              <div class="mrow"><span class="ml">Get</span><span class="mr">14 months</span></div>
+              <div class="mdiv"></div>
+              <div class="mrow tot"><span class="ml">Annual total</span><span class="mr" id="ga-tot">₹16,800</span></div>
+            </div>
+            <div class="save-pill" id="ga-save">✓ Save ₹2,800 (2 months free)</div>
+          </div>
+
+        </div><!-- /billing-row -->
+
+        <!-- Features — shown ONCE -->
+        <div class="plan-feats">
+          <div class="feats-lbl">Everything in Starter, plus</div>
+          <ul class="feats-cols">
+            <li><span class="fc">✓</span>WhatsApp Business</li>
+            <li><span class="fc">✓</span>Email Integration</li>
+            <li><span class="fc">✓</span>Automations &amp; Workflows</li>
+            <li><span class="fc">✓</span>Multi Billing Org</li>
+            <li><span class="fc">✓</span>Sprint Planner</li>
+            <li><span class="fc">✓</span>Action Center</li>
+            <li><span class="fc">✓</span>Chat &amp; Bots</li>
+            <li><span class="fc">✓</span>Turia Calendar · Todo</li>
+            <li><span class="fc">✓</span>Geo Location Attendance</li>
+            <li><span class="fc">✓</span>Reminders Manager</li>
+            <li><span class="fc">✓</span>10 GB Storage</li>
+          </ul>
+        </div>
+
+      </div><!-- /growth -->
+
+    </div><!-- /plans-row -->
+
+    <!-- Notice Add-on -->
+    <div class="notice" id="notice-card" style="display:none">
+      <div class="notice-top">
+        <div>
+          <div class="notice-badge">+ Optional Add-on · Works with any plan</div>
+          <div class="notice-title">Notice Management</div>
+          <div class="notice-sub">Auto-fetch &amp; track GST, TDS &amp; IT notices.</div>
+        </div>
+        <div style="text-align:right">
+          <div class="notice-price">₹2,500</div>
+          <div class="notice-credits">5,000 sync credits included</div>
+        </div>
+      </div>
+      <div class="notice-body">
+        <div class="nf"><span class="nf-dot"></span>GST, TDS &amp; IT portal sync — 1 credit each</div>
+        <div class="nf"><span class="nf-dot"></span>Each credit = ₹0.50</div>
+        <div class="nf"><span class="nf-dot"></span>Credits shared across modules</div>
+        <div class="nf"><span class="nf-dot"></span>Top up anytime — ₹2,500 for 5,000 credits</div>
+        <div class="nf"><span class="nf-dot"></span>First 100 credits free on signup</div>
+      </div>
+    </div>
+
+    <!-- Trial strip -->
+    <div class="trial">
+      <div class="trial-icon">⏱</div>
+      <div>
+        <div class="trial-title">15-Day Free Trial — No credit card required</div>
+        <div class="trial-sub">Full access to all features. Upgrade anytime during or after the trial.</div>
+      </div>
+    </div>
+
+  </div><!-- /q-body -->
+
+  <div class="q-footer">
+    <div class="qf-contact">
+      <div class="qf-lbl">Your Turia contact</div>
+      <div class="qf-val" id="f-name" style="font-weight:600;color:var(--text)">—</div>
+      <div class="qf-val" id="f-phone">—</div>
+      <div class="qf-val" id="f-email">—</div>
+    </div>
+    <div class="qf-brand">
+      <strong>turia.in</strong><br>
+      Practice Management for CA Firms
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+  var noticeOn = false;
+
+  var reps = {
+    'Kavin Raj':  { phone: '+91 84310 18842', email: 'kavin.raj@turia.in' },
+    'Milton':     { phone: '+91 96321 36980', email: 'milton@turia.in' },
+    'Likith S':   { phone: '+91 97423 41894', email: 'likith@turia.in' }
+  };
+
+  function toggleNotice() {
+    noticeOn = !noticeOn;
+    document.getElementById('ntog').classList.toggle('on', noticeOn);
+    document.getElementById('notice-card').style.display = noticeOn ? '' : 'none';
+  }
+
+  function g(id) { return document.getElementById(id); }
+  function inr(v) { return '₹' + Math.round(v).toLocaleString('en-IN'); }
+
+  function update() {
+    var users   = Math.max(1, parseInt(g('users').value) || 1);
+    var contact = g('contact').value.trim() || '—';
+    var repVal  = g('rep').value;
+    var repParts = repVal ? repVal.split('|') : [];
+    var repName  = repParts[0] || '—';
+    var repPhone = repParts[1] || '—';
+    var repEmail = repParts[2] || '—';
+
+    g('q-date').textContent    = new Date().toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+    g('d-contact').textContent = contact;
+    g('d-users').textContent   = users + ' user' + (users !== 1 ? 's' : '');
+
+    // STARTER
+    var S = 100;
+    var s_mo   = S * users;
+    var s_pay  = S * users * 12;
+    var s_save = S * users * 2;   // 2 months free
+    var s_eff  = Math.round((S * 12) / 14);
+
+    g('sm-u').textContent  = users;
+    g('sm-tot').textContent = inr(s_mo);
+    g('sa-u').textContent  = users;
+    g('sa-eff').textContent = s_eff;
+    g('sa-pay').textContent = inr(s_pay);
+    g('sa-tot').textContent = inr(s_pay);
+    g('sa-save').textContent = '✓ Save ' + inr(s_save) + ' (2 months free)';
+
+    // GROWTH
+    var GR = 200;
+    var g_mo   = GR * users;
+    var g_pay  = GR * users * 12;
+    var g_save = GR * users * 2;
+    var g_eff  = Math.round((GR * 12) / 14);
+
+    g('gm-u').textContent  = users;
+    g('gm-tot').textContent = inr(g_mo);
+    g('ga-u').textContent  = users;
+    g('ga-eff').textContent = g_eff;
+    g('ga-pay').textContent = inr(g_pay);
+    g('ga-tot').textContent = inr(g_pay);
+    g('ga-save').textContent = '✓ Save ' + inr(g_save) + ' (2 months free)';
+
+    g('f-name').textContent  = repName;
+    g('f-phone').textContent = repPhone;
+    g('f-email').textContent = repEmail;
+  }
+
+  update();
+
+  function printQuote() {
+    var contact = g('contact').value.trim();
+    if (contact && contact !== '—') {
+      // Set document title so Chrome uses it as PDF filename
+      var orig = document.title;
+      document.title = 'Turia-Quotation-' + contact.replace(/\s+/g, '-');
+      window.print();
+      document.title = orig;
+    } else {
+      window.print();
+    }
+  }
+</script>
+</body>
+</html>
