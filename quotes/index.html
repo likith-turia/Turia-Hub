@@ -206,6 +206,8 @@
   .mrow { display: flex; justify-content: space-between; font-size: 11.5px; }
   .mrow .ml { color: var(--text2); }
   .mrow .mr { font-weight: 600; color: var(--text); }
+  .mrow.gst .ml { color: var(--text3); font-size: 11px; }
+  .mrow.gst .mr { color: var(--text3); font-weight: 500; font-size: 11px; }
   .mdiv { height: 1px; background: var(--border); margin: 3px 0; }
   .mrow.tot .ml { font-weight: 700; color: var(--text); font-size: 12px; }
   .mrow.tot .mr { font-size: 13px; font-weight: 800; }
@@ -491,6 +493,7 @@
               <div class="mrow"><span class="ml">Users</span><span class="mr" id="sm-u">7</span></div>
               <div class="mdiv"></div>
               <div class="mrow tot"><span class="ml">Monthly total</span><span class="mr" id="sm-tot">₹700</span></div>
+              <div class="mrow gst"><span class="ml">+ 18% GST</span><span class="mr" id="sm-gst">₹126</span></div>
             </div>
           </div>
 
@@ -512,6 +515,7 @@
               <div class="mrow"><span class="ml">Get</span><span class="mr">14 months</span></div>
               <div class="mdiv"></div>
               <div class="mrow tot"><span class="ml">Annual total</span><span class="mr" id="sa-tot">₹8,400</span></div>
+              <div class="mrow gst"><span class="ml">+ 18% GST</span><span class="mr" id="sa-gst">₹1,512</span></div>
             </div>
             <div class="save-pill" id="sa-save">✓ Save ₹1,400 (2 months free)</div>
           </div>
@@ -563,6 +567,7 @@
               <div class="mrow"><span class="ml">Users</span><span class="mr" id="gm-u">7</span></div>
               <div class="mdiv"></div>
               <div class="mrow tot"><span class="ml">Monthly total</span><span class="mr" id="gm-tot">₹1,400</span></div>
+              <div class="mrow gst"><span class="ml">+ 18% GST</span><span class="mr" id="gm-gst">₹252</span></div>
             </div>
           </div>
 
@@ -584,6 +589,7 @@
               <div class="mrow"><span class="ml">Get</span><span class="mr">14 months</span></div>
               <div class="mdiv"></div>
               <div class="mrow tot"><span class="ml">Annual total</span><span class="mr" id="ga-tot">₹16,800</span></div>
+              <div class="mrow gst"><span class="ml">+ 18% GST</span><span class="mr" id="ga-gst">₹3,024</span></div>
             </div>
             <div class="save-pill" id="ga-save">✓ Save ₹2,800 (2 months free)</div>
           </div>
@@ -707,6 +713,9 @@
     g('sa-tot').textContent = inr(s_pay);
     g('sa-save').textContent = '✓ Save ' + inr(s_save) + ' (2 months free)';
 
+    g('sm-gst').textContent = inr(s_mo * 0.18);
+    g('sa-gst').textContent = inr(s_pay * 0.18);
+
     // GROWTH
     var GR = 200;
     var g_mo   = GR * users;
@@ -721,6 +730,9 @@
     g('ga-pay').textContent = inr(g_pay);
     g('ga-tot').textContent = inr(g_pay);
     g('ga-save').textContent = '✓ Save ' + inr(g_save) + ' (2 months free)';
+
+    g('gm-gst').textContent = inr(g_mo * 0.18);
+    g('ga-gst').textContent = inr(g_pay * 0.18);
 
     g('f-name').textContent  = repName;
     g('f-phone').textContent = repPhone;
