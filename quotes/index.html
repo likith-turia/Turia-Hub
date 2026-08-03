@@ -3219,7 +3219,7 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
       <option value="">— Select —</option>
       <option value="Kavin Raj|+91 84310 18842|kavin.raj@turia.in">Kavin Raj</option>
       <option value="Milton|+91 96321 36980|milton@turia.in">Milton</option>
-      <option value="Likith S|+91 77600 15359|likith@turia.in">Likith S</option>
+      <option value="Likith S|+91 77600 15359|likith@turia.in" selected>Likith S</option>
     </select>
   </div>
   <div class="ctrl-sep"></div>
@@ -3538,7 +3538,7 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
     </div>
 
     <!-- BANK -->
-    <div class="bank-card" id="bank-card" style="display:none">
+    <div class="bank-card no-print" id="bank-card" style="display:none">
       <div class="bank-title">Bank Transfer Details</div>
       <div class="bk-layout">
         <div class="bank-grid">
@@ -3892,11 +3892,15 @@ function update(){
     var upiUrl  = 'upi://pay?pa=8722750204%40pthdfc&pn=Turiabooks%20Technologies&am=' + upiAmt + '&cu=INR&tn=Turia%20Subscription';
     if (typeof QRCode !== 'undefined') {
       generateQR('bk-qr',    upiUrl, 100);
-      generateQR('ps-bk-qr', upiUrl, 82);
+      if (mode !== 'compare') {
+        generateQR('ps-bk-qr', upiUrl, 82);
+      }
     }
     var amtFmt = '₹' + Math.round(qrGrand).toLocaleString('en-IN');
     var ba = document.getElementById('bk-qr-amt');    if(ba) ba.textContent = amtFmt;
-    var pa = document.getElementById('ps-bk-qr-amt'); if(pa) pa.textContent = amtFmt;
+    if (mode !== 'compare') {
+      var pa = document.getElementById('ps-bk-qr-amt'); if(pa) pa.textContent = amtFmt;
+    }
   g('ps-rep-name').textContent=rp[0];
   g('ps-rep-phone').textContent=rp[1];
   g('ps-rep-email').textContent=rp[2];
