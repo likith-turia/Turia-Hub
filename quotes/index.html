@@ -3221,7 +3221,28 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
       <option value="2" selected>2 mo</option>
       <option value="3">3 mo</option>
       <option value="4">4 mo</option>
+      <option value="5">5 mo</option>
+      <option value="6">6 mo</option>
+      <option value="8">8 mo</option>
+      <option value="10">10 mo</option>
+      <option value="12">12 mo</option>
     </select>
+  </div>
+  <div class="field">
+    <label>Term 1 (Mo)</label>
+    <input type="number" id="term1-months" class="w-sm" value="1" min="1" max="99" oninput="update()" style="width:65px">
+  </div>
+  <div class="field">
+    <label>Term 2 (Mo)</label>
+    <input type="number" id="term2-months" class="w-sm" value="12" min="1" max="99" oninput="update()" style="width:65px">
+  </div>
+  <div class="field">
+    <label>Starter ₹/mo</label>
+    <input type="number" id="starter-price" class="w-sm" value="100" min="0" oninput="update()" style="width:75px">
+  </div>
+  <div class="field">
+    <label>Growth ₹/mo</label>
+    <input type="number" id="growth-price" class="w-sm" value="200" min="0" oninput="update()" style="width:75px">
   </div>
   <div class="field">
     <label>Rep</label>
@@ -3298,29 +3319,29 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
         <!-- Both billing columns always visible; clicking selects -->
         <div class="billing-grid">
           <div class="billing-col bc-dim" id="bc-g-mo" onclick="setBilling('monthly')" style="cursor:pointer">
-            <div class="bc-head"><span class="bc-label">Monthly</span><span class="bc-sel-tag" id="bst-g-mo" style="display:none">✓ Selected</span></div>
-            <div class="bc-price"><span class="bc-sym">₹</span><span class="bc-num">200</span></div>
+            <div class="bc-head"><span class="bc-label" id="g-term1-lbl">Monthly</span><span class="bc-sel-tag" id="bst-g-mo" style="display:none">✓ Selected</span></div>
+            <div class="bc-price"><span class="bc-sym">₹</span><span class="bc-num" id="g-mo-price">200</span></div>
             <div class="bc-per">per user / month</div>
             <div class="bc-div"></div>
             <div class="bc-row"><span class="l">Users</span><span class="r" id="g-mo-u">7</span></div>
-            <div class="bc-row bc-tot"><span class="l">Monthly total</span><span class="r" id="g-mo-tot">₹1,400</span></div>
+            <div class="bc-row bc-tot"><span class="l" id="g-mo-tot-lbl">Monthly total</span><span class="r" id="g-mo-tot">₹1,400</span></div>
             <div class="bc-row bc-gst-row"><span class="l">+ 18% GST</span><span class="r" id="g-mo-gst">₹252</span></div>
             <div class="bc-row bc-tot" style="border-top-style:dashed"><span class="l">Total payable</span><span class="r" id="g-mo-fin">₹1,652</span></div>
           </div>
           <div class="billing-col sel" id="bc-g-ann" onclick="setBilling('annual')" style="cursor:pointer">
-            <div class="bc-head"><span class="bc-label">Annual</span><span class="bc-sel-tag" id="bst-g-ann">✓ Selected</span></div>
-            <div class="bc-price"><span class="bc-sym">₹</span><span class="bc-num" id="g-eff">171</span><span class="bc-cross">₹200</span></div>
+            <div class="bc-head"><span class="bc-label" id="g-term2-lbl">Annual</span><span class="bc-sel-tag" id="bst-g-ann">✓ Selected</span></div>
+            <div class="bc-price"><span class="bc-sym">₹</span><span class="bc-num" id="g-eff">171</span><span class="bc-cross" id="g-ann-cross">₹200</span></div>
             <div class="bc-per">effective per user / month</div>
             <div class="bc-div"></div>
             <div class="bc-row"><span class="l">Users</span><span class="r" id="g-ann-u">7</span></div>
-            <div class="bc-row"><span class="l">Pay (12 months)</span><span class="r" id="g-ann-pay">₹16,800</span></div>
+            <div class="bc-row"><span class="l" id="g-ann-pay-lbl">Pay (12 months)</span><span class="r" id="g-ann-pay">₹16,800</span></div>
             <div class="bc-row"><span class="l">Get</span><span class="r" id="g-ann-get" style="font-weight:800;color:var(--purple-dark)">14 months</span></div>
-            <div class="bc-row bc-tot"><span class="l">Annual total</span><span class="r" id="g-ann-tot">₹16,800</span></div>
+            <div class="bc-row bc-tot"><span class="l" id="g-ann-tot-lbl">Annual total</span><span class="r" id="g-ann-tot">₹16,800</span></div>
             <div class="bc-row bc-gst-row"><span class="l">+ 18% GST</span><span class="r" id="g-ann-gst">₹3,024</span></div>
             <div class="bc-row bc-tot" style="border-top-style:dashed"><span class="l">Total payable</span><span class="r" id="g-ann-fin">₹19,824</span></div>
             <div class="bc-save" id="g-ann-save">✓ Save ₹2,800 (2 months free)</div>
             <div class="savings-summary" id="g-savings">
-              <div class="ss-row"><span class="ss-lbl">You pay for</span><span class="ss-val">12 months</span></div>
+              <div class="ss-row"><span class="ss-lbl">You pay for</span><span class="ss-val" id="g-ss-pay-val">12 months</span></div>
               <div class="ss-row"><span class="ss-lbl">You get access for</span><span class="ss-val" id="g-ss-get">14 months</span></div>
               <div class="ss-divider"></div>
               <div class="ss-row"><span class="ss-lbl">Effective rate</span><span class="ss-val" id="g-ss-rate">₹171/user/mo</span></div>
@@ -3371,29 +3392,29 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
         </div>
         <div class="billing-grid">
           <div class="billing-col bc-dim" id="bc-s-mo" onclick="setBilling('monthly')" style="cursor:pointer">
-            <div class="bc-head"><span class="bc-label">Monthly</span><span class="bc-sel-tag" id="bst-s-mo" style="display:none">✓ Selected</span></div>
-            <div class="bc-price"><span class="bc-sym">₹</span><span class="bc-num">100</span></div>
+            <div class="bc-head"><span class="bc-label" id="s-term1-lbl">Monthly</span><span class="bc-sel-tag" id="bst-s-mo" style="display:none">✓ Selected</span></div>
+            <div class="bc-price"><span class="bc-sym">₹</span><span class="bc-num" id="s-mo-price">100</span></div>
             <div class="bc-per">per user / month</div>
             <div class="bc-div"></div>
             <div class="bc-row"><span class="l">Users</span><span class="r" id="s-mo-u">7</span></div>
-            <div class="bc-row bc-tot"><span class="l">Monthly total</span><span class="r" id="s-mo-tot">₹700</span></div>
+            <div class="bc-row bc-tot"><span class="l" id="s-mo-tot-lbl">Monthly total</span><span class="r" id="s-mo-tot">₹700</span></div>
             <div class="bc-row bc-gst-row"><span class="l">+ 18% GST</span><span class="r" id="s-mo-gst">₹126</span></div>
             <div class="bc-row bc-tot" style="border-top-style:dashed"><span class="l">Total payable</span><span class="r" id="s-mo-fin">₹826</span></div>
           </div>
           <div class="billing-col sel" id="bc-s-ann" onclick="setBilling('annual')" style="cursor:pointer">
-            <div class="bc-head"><span class="bc-label">Annual</span><span class="bc-sel-tag" id="bst-s-ann">✓ Selected</span></div>
-            <div class="bc-price"><span class="bc-sym">₹</span><span class="bc-num" id="s-eff">86</span><span class="bc-cross">₹100</span></div>
+            <div class="bc-head"><span class="bc-label" id="s-term2-lbl">Annual</span><span class="bc-sel-tag" id="bst-s-ann">✓ Selected</span></div>
+            <div class="bc-price"><span class="bc-sym">₹</span><span class="bc-num" id="s-eff">86</span><span class="bc-cross" id="s-ann-cross">₹100</span></div>
             <div class="bc-per">effective per user / month</div>
             <div class="bc-div"></div>
             <div class="bc-row"><span class="l">Users</span><span class="r" id="s-ann-u">7</span></div>
-            <div class="bc-row"><span class="l">Pay (12 months)</span><span class="r" id="s-ann-pay">₹8,400</span></div>
+            <div class="bc-row"><span class="l" id="s-ann-pay-lbl">Pay (12 months)</span><span class="r" id="s-ann-pay">₹8,400</span></div>
             <div class="bc-row"><span class="l">Get</span><span class="r" id="s-ann-get" style="font-weight:800;color:var(--teal-dark)">14 months</span></div>
-            <div class="bc-row bc-tot"><span class="l">Annual total</span><span class="r" id="s-ann-tot">₹8,400</span></div>
+            <div class="bc-row bc-tot"><span class="l" id="s-ann-tot-lbl">Annual total</span><span class="r" id="s-ann-tot">₹8,400</span></div>
             <div class="bc-row bc-gst-row"><span class="l">+ 18% GST</span><span class="r" id="s-ann-gst">₹1,512</span></div>
             <div class="bc-row bc-tot" style="border-top-style:dashed"><span class="l">Total payable</span><span class="r" id="s-ann-fin">₹9,912</span></div>
             <div class="bc-save" id="s-ann-save">✓ Save ₹1,400 (2 months free)</div>
             <div class="savings-summary" id="s-savings">
-              <div class="ss-row"><span class="ss-lbl">You pay for</span><span class="ss-val">12 months</span></div>
+              <div class="ss-row"><span class="ss-lbl">You pay for</span><span class="ss-val" id="s-ss-pay-val">12 months</span></div>
               <div class="ss-row"><span class="ss-lbl">You get access for</span><span class="ss-val" id="s-ss-get">14 months</span></div>
               <div class="ss-divider"></div>
               <div class="ss-row"><span class="ss-lbl">Effective rate</span><span class="ss-val" id="s-ss-rate">₹86/user/mo</span></div>
@@ -3438,10 +3459,10 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
 
         <!-- Monthly pricing -->
         <div class="cg">
-          <div class="cc" style="font-weight:700;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center">Monthly</div>
+          <div class="cc" style="font-weight:700;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center" id="c-term1-lbl">Monthly</div>
           <div class="cc ctr">
             <div class="c-pblock">
-              <div class="c-pmain">₹100<span style="font-size:11px;font-weight:500;color:var(--text3)">/user</span></div>
+              <div class="c-pmain" id="c-s-mo-price">₹100<span style="font-size:11px;font-weight:500;color:var(--text3)">/user</span></div>
               <div class="c-psub2" id="c-s-mo-base">Base: ₹700/mo</div>
               <div class="c-psub2" id="c-s-mo-gst">+ GST: ₹126</div>
               <div class="c-ptotal" id="c-s-mo-tot">Total: ₹826/mo</div>
@@ -3449,7 +3470,7 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
           </div>
           <div class="cc ctr gcol">
             <div class="c-pblock">
-              <div class="c-pmain g">₹200<span style="font-size:11px;font-weight:500;color:var(--text3)">/user</span></div>
+              <div class="c-pmain g" id="c-g-mo-price">₹200<span style="font-size:11px;font-weight:500;color:var(--text3)">/user</span></div>
               <div class="c-psub2" id="c-g-mo-base">Base: ₹1,400/mo</div>
               <div class="c-psub2" id="c-g-mo-gst">+ GST: ₹252</div>
               <div class="c-ptotal g" id="c-g-mo-tot">Total: ₹1,652/mo</div>
@@ -3459,10 +3480,10 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
 
         <!-- Annual pricing -->
         <div class="cg alt">
-          <div class="cc" style="font-weight:700;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:5px">Annual<span style="background:var(--green-bg);color:var(--green-dark);font-size:9px;padding:1px 5px;border-radius:10px;font-weight:700">Best value</span></div>
+          <div class="cc" style="font-weight:700;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:5px" id="c-term2-lbl">Annual<span style="background:var(--green-bg);color:var(--green-dark);font-size:9px;padding:1px 5px;border-radius:10px;font-weight:700">Best value</span></div>
           <div class="cc ctr">
             <div class="c-pblock">
-              <div class="c-pmain">₹86<span style="font-size:11px;font-weight:500;color:var(--text3)">/user eff.</span></div>
+              <div class="c-pmain" id="c-s-ann-price">₹86<span style="font-size:11px;font-weight:500;color:var(--text3)">/user eff.</span></div>
               <div class="c-psub2" id="c-s-ann-pay">Pay: ₹8,400 (12mo)</div>
               <div class="c-psub2" id="c-s-ann-gst">+ GST: ₹1,512</div>
               <div class="c-ptotal" id="c-s-ann-tot">Total: ₹9,912/yr</div>
@@ -3471,7 +3492,7 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
           </div>
           <div class="cc ctr gcol">
             <div class="c-pblock">
-              <div class="c-pmain g">₹171<span style="font-size:11px;font-weight:500;color:var(--text3)">/user eff.</span></div>
+              <div class="c-pmain g" id="c-g-ann-price">₹171<span style="font-size:11px;font-weight:500;color:var(--text3)">/user eff.</span></div>
               <div class="c-psub2" id="c-g-ann-pay">Pay: ₹16,800 (12mo)</div>
               <div class="c-psub2" id="c-g-ann-gst">+ GST: ₹3,024</div>
               <div class="c-ptotal g" id="c-g-ann-tot">Total: ₹19,824/yr</div>
@@ -3764,14 +3785,28 @@ function toggleBank(){
   update();
 }
 
+function getTermLabel(months) {
+  if (months === 1) return 'Monthly';
+  if (months === 12) return 'Annual';
+  if (months === 18) return '1.5 Years';
+  if (months === 24) return '2 Years';
+  return months + ' Months';
+}
+
 function update(){
   var freeMonths=parseInt(g('free-months').value);
   if(isNaN(freeMonths)) freeMonths=2;
-  freeMonths=Math.max(0,Math.min(4,freeMonths));
+  freeMonths=Math.max(0,Math.min(12,freeMonths));
 
   var users=parseInt(g('users').value);
   if(isNaN(users)) users=7;
   users=Math.max(1,users);
+  
+  var term1=Math.max(1,parseInt(g('term1-months').value)||1);
+  var term2=Math.max(1,parseInt(g('term2-months').value)||12);
+  var S=Math.max(0,parseInt(g('starter-price').value)||0);
+  var G=Math.max(0,parseInt(g('growth-price').value)||0);
+
   var contact=g('contact').value.trim()||'—';
   var rp=g('rep').value?g('rep').value.split('|'):['—','—','—'];
   var today=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
@@ -3781,11 +3816,43 @@ function update(){
   g('d-users').textContent=users+' user'+(users!==1?'s':'');
   g('f-name').textContent=rp[0]; g('f-phone').textContent=rp[1]; g('f-email').textContent=rp[2];
 
-  var S=100,G=200;
-  var sMo=S*users, gMo=G*users;
-  var sAnn=S*users*12, gAnn=G*users*12;
+  // Set card base prices dynamically
+  g('s-mo-price').textContent=S;
+  g('s-ann-cross').textContent=inr(S);
+  g('g-mo-price').textContent=G;
+  g('g-ann-cross').textContent=inr(G);
+
+  var term1Lbl = getTermLabel(term1);
+  var term2Lbl = getTermLabel(term2);
+
+  // Set header labels on cards
+  g('s-term1-lbl').textContent = term1Lbl;
+  g('s-term2-lbl').textContent = term2Lbl;
+  g('g-term1-lbl').textContent = term1Lbl;
+  g('g-term2-lbl').textContent = term2Lbl;
+
+  // Set comparison labels
+  g('c-term1-lbl').textContent = term1Lbl;
+  g('c-term2-lbl').innerHTML = term2Lbl + ' <span style="background:var(--green-bg);color:var(--green-dark);font-size:9px;padding:1px 5px;border-radius:10px;font-weight:700">Best value</span>';
+
+  // Set row total labels on Monthly cards
+  g('s-mo-tot-lbl').textContent = term1Lbl + ' total';
+  g('g-mo-tot-lbl').textContent = term1Lbl + ' total';
+
+  // Set row pay & total labels on Annual cards
+  g('s-ann-pay-lbl').textContent = 'Pay (' + term2 + ' months)';
+  g('g-ann-pay-lbl').textContent = 'Pay (' + term2 + ' months)';
+  g('s-ann-tot-lbl').textContent = term2Lbl + ' total';
+  g('g-ann-tot-lbl').textContent = term2Lbl + ' total';
+
+  // Set savings summary pay val
+  g('g-ss-pay-val').textContent = term2 + ' month' + (term2 !== 1 ? 's' : '');
+  g('s-ss-pay-val').textContent = term2 + ' month' + (term2 !== 1 ? 's' : '');
+
+  var sMo=S*users*term1, gMo=G*users*term1;
+  var sAnn=S*users*term2, gAnn=G*users*term2;
   var sSave=S*users*freeMonths, gSave=G*users*freeMonths;
-  var sEff=Math.round(S*12/(12+freeMonths)), gEff=Math.round(G*12/(12+freeMonths));
+  var sEff=Math.round(S*term2/(term2+freeMonths)), gEff=Math.round(G*term2/(term2+freeMonths));
 
   // ── Starter single ──
   g('s-mo-u').textContent=users; g('s-mo-tot').textContent=inr(sMo);
@@ -3794,39 +3861,39 @@ function update(){
   g('s-ann-pay').textContent=inr(sAnn); g('s-ann-tot').textContent=inr(sAnn);
   g('s-ann-gst').textContent=inr(sAnn*.18); g('s-ann-fin').textContent=inr(sAnn*1.18);
   g('s-ann-save').style.display=freeMonths>0?'':'none';
-  g('s-ann-save').textContent='✓ Save '+inr(sSave)+' — '+freeMonths+' months free — '+Math.round(freeMonths/12*100)+'% more value';
+  g('s-ann-save').textContent='✓ Save '+inr(sSave)+' — '+freeMonths+' months free — '+Math.round(freeMonths/term2*100)+'% more value';
 
   // ── Growth single ──
   g('g-mo-u').textContent=users; g('g-mo-tot').textContent=inr(gMo);
   g('g-mo-gst').textContent=inr(gMo*.18); g('g-mo-fin').textContent=inr(gMo*1.18);
   g('g-ann-u').textContent=users; g('g-eff').textContent=gEff;
-  if(g('g-ann-get'))g('g-ann-get').textContent=(12+freeMonths)+' months';
-  if(g('s-ann-get'))g('s-ann-get').textContent=(12+freeMonths)+' months';
+  if(g('g-ann-get'))g('g-ann-get').textContent=(term2+freeMonths)+' months';
+  if(g('s-ann-get'))g('s-ann-get').textContent=(term2+freeMonths)+' months';
   // savings summary
   if(g('g-savings')) g('g-savings').style.display=freeMonths>0?'':'none';
   if(g('s-savings')) g('s-savings').style.display=freeMonths>0?'':'none';
   if(g('g-ss-get')){
-    g('g-ss-get').textContent=(12+freeMonths)+' months';
+    g('g-ss-get').textContent=(term2+freeMonths)+' months';
     g('g-ss-rate').textContent='₹'+gEff+'/user/mo';
     g('g-ss-saved').textContent=inr(gSave);
-    if(g('g-ss-pct')){var pct=Math.round(freeMonths/12*100);g('g-ss-pct').textContent=pct+'% more value';g('g-ss-pct').setAttribute('data-tip',freeMonths+' free month'+(freeMonths>1?'s':'')+' ÷ 12 paid months = '+pct+'%. You get '+pct+'% more access than what you actually paid for.');}
+    if(g('g-ss-pct')){var pct=Math.round(freeMonths/term2*100);g('g-ss-pct').textContent=pct+'% more value';g('g-ss-pct').setAttribute('data-tip',freeMonths+' free month'+(freeMonths>1?'s':'')+' ÷ '+term2+' paid months = '+pct+'%. You get '+pct+'% more access than what you actually paid for.');}
   }
   if(g('s-ss-get')){
-    g('s-ss-get').textContent=(12+freeMonths)+' months';
+    g('s-ss-get').textContent=(term2+freeMonths)+' months';
     g('s-ss-rate').textContent='₹'+sEff+'/user/mo';
     g('s-ss-saved').textContent=inr(sSave);
-    if(g('s-ss-pct')){var pct2=Math.round(freeMonths/12*100);g('s-ss-pct').textContent=pct2+'% more value';g('s-ss-pct').setAttribute('data-tip',freeMonths+' free month'+(freeMonths>1?'s':'')+' ÷ 12 paid months = '+pct2+'%. You get '+pct2+'% more access than what you actually paid for.');}
+    if(g('s-ss-pct')){var pct2=Math.round(freeMonths/term2*100);g('s-ss-pct').textContent=pct2+'% more value';g('s-ss-pct').setAttribute('data-tip',freeMonths+' free month'+(freeMonths>1?'s':'')+' ÷ '+term2+' paid months = '+pct2+'%. You get '+pct2+'% more access than what you actually paid for.');}
   }
   g('g-ann-pay').textContent=inr(gAnn); g('g-ann-tot').textContent=inr(gAnn);
   g('g-ann-gst').textContent=inr(gAnn*.18); g('g-ann-fin').textContent=inr(gAnn*1.18);
   g('g-ann-save').style.display=freeMonths>0?'':'none';
-  g('g-ann-save').textContent='✓ Save '+inr(gSave)+' — '+freeMonths+' months free — '+Math.round(freeMonths/12*100)+'% more value';
+  g('g-ann-save').textContent='✓ Save '+inr(gSave)+' — '+freeMonths+' months free — '+Math.round(freeMonths/term2*100)+'% more value';
 
   // ── Compare ──
   g('c-s-mo-base').textContent='Base: '+inr(sMo)+'/mo';
   g('c-s-mo-gst').textContent='+ GST: '+inr(sMo*.18);
   g('c-s-mo-tot').textContent='Total: '+inr(sMo*1.18)+'/mo';
-  g('c-s-ann-pay').textContent='Pay: '+inr(sAnn)+' (12mo)';
+  g('c-s-ann-pay').textContent='Pay: '+inr(sAnn)+' ('+term2+'mo)';
   g('c-s-ann-gst').textContent='+ GST: '+inr(sAnn*.18);
   g('c-s-ann-tot').textContent='Total: '+inr(sAnn*1.18)+'/yr';
   g('c-s-ann-save').style.display=freeMonths>0?'':'none';
@@ -3834,11 +3901,18 @@ function update(){
   g('c-g-mo-base').textContent='Base: '+inr(gMo)+'/mo';
   g('c-g-mo-gst').textContent='+ GST: '+inr(gMo*.18);
   g('c-g-mo-tot').textContent='Total: '+inr(gMo*1.18)+'/mo';
-  g('c-g-ann-pay').textContent='Pay: '+inr(gAnn)+' (12mo)';
+  g('c-g-ann-pay').textContent='Pay: '+inr(gAnn)+' ('+term2+'mo)';
   g('c-g-ann-gst').textContent='+ GST: '+inr(gAnn*.18);
   g('c-g-ann-tot').textContent='Total: '+inr(gAnn*1.18)+'/yr';
   g('c-g-ann-save').style.display=freeMonths>0?'':'none';
   g('c-g-ann-save').textContent='Save '+inr(gSave);
+  
+  // Set comparison base rate cell contents dynamically
+  g('c-s-mo-price').innerHTML = inr(S) + '<span style="font-size:11px;font-weight:500;color:var(--text3)">/user</span>';
+  g('c-g-mo-price').innerHTML = inr(G) + '<span style="font-size:11px;font-weight:500;color:var(--text3)">/user</span>';
+  g('c-s-ann-price').innerHTML = inr(sEff) + '<span style="font-size:11px;font-weight:500;color:var(--text3)">/user eff.</span>';
+  g('c-g-ann-price').innerHTML = inr(gEff) + '<span style="font-size:11px;font-weight:500;color:var(--text3)">/user eff.</span>';
+
   var nAmt=noticeOn?5900:0;
   g('cmp-s-grand').textContent=inr(sAnn*1.18+nAmt);
   g('cmp-g-grand').textContent=inr(gAnn*1.18+nAmt);
@@ -3850,7 +3924,7 @@ function update(){
   var selTotal=selBase*1.18;
   var grand=selTotal+(noticeOn?5900:0);
   var modeLabel=mode==='compare'?'Compare':(plan==='starter'?'Starter':'Growth');
-  g('sum-cfg').textContent=modeLabel+' · '+(billing==='annual'?'Annual':'Monthly')+' · '+users+' user'+(users!==1?'s':'');
+  g('sum-cfg').textContent=modeLabel+' · '+getTermLabel(billing==='annual'?term2:term1)+' · '+users+' user'+(users!==1?'s':'');
   g('sum-plan').textContent='Plan: '+inr(selTotal);
   g('sum-notice').textContent='Notice: ₹5,900';
   g('sum-nsep').style.display=noticeOn?'':'none';
@@ -3859,7 +3933,7 @@ function update(){
 
   // ── Print page 2 ──
   var selR=plan==='starter'?S:G;
-  var selB2=billing==='annual'?selR*users*12:selR*users;
+  var selB2=billing==='annual'?selR*users*term2:selR*users*term1;
   var selG2=selB2*.18;
   var sub2=selB2+(noticeOn?5000:0);
   var tGST=selG2+(noticeOn?900:0);
@@ -3869,22 +3943,22 @@ function update(){
   g('ps-users').textContent=users+' user'+(users!==1?'s':'');
   if(mode==='compare'){
     // Compare mode: always show Growth Annual summary
-    var gu=users,gr=200,gann=gr*gu*12;
+    var gu=users,gr=G,gann=gr*gu*term2;
     var gsub=gann+(noticeOn?5000:0);
     var ggst=gann*0.18+(noticeOn?900:0);
     var ggrand=gsub+ggst;
-    g('ps-plan-billing').textContent='Growth · Annual';
-    g('ps-pname').textContent='Growth Plan — Annual';
-    g('ps-psub').textContent='₹200/user/month × 12 months · '+(12+freeMonths)+' months access';
+    g('ps-plan-billing').textContent='Growth · '+getTermLabel(term2);
+    g('ps-pname').textContent='Growth Plan — '+getTermLabel(term2);
+    g('ps-psub').textContent='₹'+G+'/user/month × '+term2+' months · '+(term2+freeMonths)+' months access';
     g('ps-pqty').textContent=gu;
-    g('ps-prate').textContent=inr(gr*12);
+    g('ps-prate').textContent=inr(gr*term2);
     g('ps-pamt').textContent=inr(gann);
     g('ps-nrow').style.display=noticeOn?'':'none';
     g('ps-sub').textContent=inr(gsub);
     g('ps-gst').textContent=inr(ggst);
     g('ps-grand').textContent=inr(ggrand);
     g('ps-save').style.display=freeMonths>0?'':'none';
-    g('ps-save').textContent='✓ Annual plan — '+freeMonths+' months free access included';
+    g('ps-save').textContent='✓ '+getTermLabel(term2)+' plan — '+freeMonths+' months free access included';
     g('ps-bank').style.display='';
     // Update QR for Growth annual + notice
     var cmpAmt=ggrand.toFixed(2);
@@ -3892,18 +3966,18 @@ function update(){
     if(typeof QRCode!=='undefined'){generateQR('ps-bk-qr',cmpUrl,82);}
     var pa=document.getElementById('ps-bk-qr-amt');if(pa)pa.textContent=inr(ggrand);
   } else {
-    g('ps-plan-billing').textContent=(plan==='starter'?'Starter':'Growth')+' · '+(billing==='annual'?'Annual':'Monthly');
-    g('ps-pname').textContent=(plan==='starter'?'Starter':'Growth')+' Plan — '+(billing==='annual'?'Annual':'Monthly');
-    g('ps-psub').textContent='₹'+selR+'/user/month'+(billing==='annual'?' × 12 months · '+(12+freeMonths)+' months access':'');
+    g('ps-plan-billing').textContent=(plan==='starter'?'Starter':'Growth')+' · '+getTermLabel(billing==='annual'?term2:term1);
+    g('ps-pname').textContent=(plan==='starter'?'Starter':'Growth')+' Plan — '+getTermLabel(billing==='annual'?term2:term1);
+    g('ps-psub').textContent='₹'+selR+'/user/month × '+(billing==='annual'?term2:term1)+' months · '+(billing==='annual'?(term2+freeMonths):term1)+' months access';
     g('ps-pqty').textContent=users;
-    g('ps-prate').textContent=inr(billing==='annual'?selR*12:selR);
+    g('ps-prate').textContent=inr(billing==='annual'?selR*term2:selR*term1);
     g('ps-pamt').textContent=inr(selB2);
     g('ps-nrow').style.display=noticeOn?'':'none';
     g('ps-sub').textContent=inr(sub2);
     g('ps-gst').textContent=inr(tGST);
     g('ps-grand').textContent=inr(gd2);
     g('ps-save').style.display=(billing==='annual' && freeMonths>0)?'':'none';
-    g('ps-save').textContent='✓ Annual plan — '+freeMonths+' months free access included';
+    g('ps-save').textContent='✓ '+getTermLabel(term2)+' plan — '+freeMonths+' months free access included';
     g('ps-bank').style.display=bankOn?'':'none';
   }
 
