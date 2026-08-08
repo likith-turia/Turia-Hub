@@ -378,8 +378,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   border: 1px solid var(--border2);
   border-radius: var(--radius-lg);
   box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-  width: 420px;
-  max-width: 90%;
+  width: 440px;
+  max-width: 95%;
   overflow: hidden;
   animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -394,50 +394,101 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .modal-body {
   padding: 20px;
 }
-.summary-section {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+.modal-comp-table {
+  width: 100%;
+  border-collapse: collapse;
   margin-bottom: 16px;
+  font-size: 12px;
 }
-.comparison-section {
+.modal-comp-table th {
+  text-align: left;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  padding: 6px 8px;
+  border-bottom: 2px solid var(--border2);
+}
+.modal-comp-table th.ctr {
+  text-align: center;
+}
+.modal-comp-table td {
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-comp-table td.ctr {
+  text-align: center;
+}
+.modal-comp-table td.lbl {
+  color: var(--text2);
+  font-weight: 500;
+}
+.modal-comp-table td.val {
+  color: var(--text);
+  font-weight: 600;
+}
+.modal-comp-table tr.highlight-row {
+  background: var(--bg2);
+}
+.modal-comp-table tr.highlight-row td.val {
+  color: var(--purple-dark);
+}
+.modal-comp-table tr.divider-row td {
+  height: 4px;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+.modal-comp-table tr.grand-row {
+  background: var(--purple-bg);
+}
+.modal-comp-table tr.grand-row td {
+  border-top: 1.5px solid var(--purple-border);
+  border-bottom: 1.5px solid var(--purple-border);
+  padding: 10px 8px;
+}
+.modal-comp-table tr.grand-row td.lbl {
+  font-weight: 700;
+  color: var(--purple-dark);
+}
+.modal-comp-table tr.grand-row td.val {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--purple-dark);
+}
+.loss-highlight-box {
   background: var(--bg2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 12px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 16px;
-}
-.summary-row {
+  padding: 10px 14px;
   display: flex;
   justify-content: space-between;
-  font-size: 12.5px;
+  align-items: center;
+  margin-bottom: 16px;
 }
-.summary-row .lbl {
-  color: var(--text2);
+.loss-highlight-box.loss {
+  border-color: rgba(180,83,9,0.15);
+  background: #fffcf5;
 }
-.summary-row .val {
-  font-weight: 600;
+.loss-highlight-box.profit {
+  border-color: rgba(15,110,86,0.15);
+  background: #f5fbf9;
+}
+.loss-highlight-box .lbl {
+  font-size: 13px;
+  font-weight: 700;
   color: var(--text);
 }
-.summary-row.divider {
-  height: 1px;
-  background: var(--border);
-  margin: 6px 0;
+.loss-highlight-box .val {
+  font-size: 15px;
+  font-weight: 800;
 }
-.summary-row.highlight {
-  font-size: 13.5px;
+.loss-highlight-box.loss .val {
+  color: var(--amber-dark);
 }
-.summary-row.highlight .lbl {
-  font-weight: 700;
-}
-.summary-row.highlight.loss .val {
-  color: var(--amber-mid);
-}
-.summary-row.highlight.profit .val {
-  color: var(--teal-mid);
+.loss-highlight-box.profit .val {
+  color: var(--teal-dark);
 }
 .modal-warning {
   background: var(--amber-bg);
@@ -4148,41 +4199,76 @@ function printQuote(){
   var S_std = (plan === 'starter' ? 100 : 200);
   var term = (billing === 'annual' ? term2 : term1);
   var std_free = (billing === 'annual' ? 2 : 0);
+  
   var price_loss = (S_std - (plan === 'starter' ? S : G)) * users * term;
   var free_loss = S_std * users * (freeMonths - std_free);
   var net_loss = price_loss + free_loss;
 
-  // Calculate totals
-  var selR = plan === 'starter' ? S : G;
-  var customTotal = selR * users * term;
-  var stdTotal = S_std * users * term;
+  // Standard Values
+  var stdBase = S_std;
+  var stdPaid = term;
+  var stdFree = std_free;
+  var stdAccess = stdPaid + stdFree;
+  var stdEff = Math.round(stdBase * stdPaid / stdAccess);
+  var stdSub = stdBase * users * stdPaid;
+  var stdGst = stdSub * 0.18;
+  var stdGrand = stdSub * 1.18;
 
-  // Populate modal fields
-  g('m-client').textContent = g('contact').value.trim() || '—';
-  g('m-plan').textContent = plan === 'starter' ? 'Starter' : 'Growth';
-  g('m-users').textContent = users + ' user' + (users !== 1 ? 's' : '');
-  g('m-term').textContent = getTermLabel(term) + (freeMonths > 0 ? ' + ' + freeMonths + ' mo free' : '');
-  g('m-price').textContent = inr(selR) + '/user/mo';
-  g('m-total').textContent = inr(customTotal) + ' (excl. GST)';
+  // Custom Values
+  var custBase = plan === 'starter' ? S : G;
+  var custPaid = term;
+  var custFree = freeMonths;
+  var custAccess = custPaid + custFree;
+  var custEff = Math.round(custBase * custPaid / custAccess);
+  var custSub = custBase * users * custPaid;
+  var custGst = custSub * 0.18;
+  var custGrand = custSub * 1.18;
+
+  // Populate comparison table fields
+  g('m-std-base').textContent = inr(stdBase);
+  g('m-cust-base').textContent = inr(custBase);
   
-  g('m-std-rate').textContent = inr(S_std) + '/user/mo';
-  g('m-std-total').textContent = inr(stdTotal) + ' (excl. GST)';
+  g('m-std-paid').textContent = stdPaid + ' mo';
+  g('m-cust-paid').textContent = custPaid + ' mo';
   
-  var lossRow = g('m-loss-row');
+  g('m-std-free').textContent = stdFree + ' mo';
+  g('m-cust-free').textContent = custFree + ' mo';
+  
+  g('m-std-access').textContent = stdAccess + ' mo';
+  g('m-cust-access').textContent = custAccess + ' mo';
+  
+  g('m-std-eff').textContent = inr(stdEff) + '/user/mo';
+  g('m-cust-eff').textContent = inr(custEff) + '/user/mo';
+  
+  g('m-std-sub').textContent = inr(stdSub);
+  g('m-cust-sub').textContent = inr(custSub);
+  
+  g('m-std-gst').textContent = inr(stdGst);
+  g('m-cust-gst').textContent = inr(custGst);
+  
+  g('m-std-grand').textContent = inr(stdGrand);
+  g('m-cust-grand').textContent = inr(custGrand);
+  
+  // Loss highlight box
+  var lossBox = g('m-loss-box');
   var lossLbl = g('m-loss-lbl');
   var lossVal = g('m-loss-val');
   
   if (net_loss > 0) {
-    lossRow.className = 'summary-row highlight loss';
+    lossBox.className = 'loss-highlight-box loss';
     lossLbl.textContent = 'Net Loss (Discount):';
     lossVal.textContent = inr(net_loss);
     g('m-warning').style.display = '';
   } else {
-    lossRow.className = 'summary-row highlight profit';
+    lossBox.className = 'loss-highlight-box profit';
     lossLbl.textContent = 'Extra Margin / Savings:';
     lossVal.textContent = inr(Math.abs(net_loss));
     g('m-warning').style.display = 'none';
   }
+
+  // Populate client details in header warning
+  var clientName = g('contact').value.trim() || 'Client';
+  g('m-client-name').textContent = clientName;
 
   // Show modal
   g('confirm-modal').style.display = 'flex';
@@ -4213,27 +4299,67 @@ document.addEventListener('DOMContentLoaded',function(){
   <div class="modal-card">
     <div class="modal-header">Quote Authorization</div>
     <div class="modal-body">
-      <div class="summary-section">
-        <div class="summary-row"><span class="lbl">Client / Contact:</span><span class="val" id="m-client">—</span></div>
-        <div class="summary-row"><span class="lbl">Plan Selected:</span><span class="val" id="m-plan">—</span></div>
-        <div class="summary-row"><span class="lbl">Users Count:</span><span class="val" id="m-users">—</span></div>
-        <div class="summary-row"><span class="lbl">Billing Term:</span><span class="val" id="m-term">—</span></div>
-        <div class="summary-row"><span class="lbl">Custom Price:</span><span class="val" id="m-price">—</span></div>
-        <div class="summary-row"><span class="lbl">Total Payable:</span><span class="val" id="m-total">—</span></div>
-      </div>
       
-      <div class="comparison-section">
-        <div class="summary-row"><span class="lbl">Standard Rate:</span><span class="val" id="m-std-rate">—</span></div>
-        <div class="summary-row"><span class="lbl">Standard Total:</span><span class="val" id="m-std-total">—</span></div>
-        <div class="summary-row divider"></div>
-        <div class="summary-row highlight" id="m-loss-row">
-          <span class="lbl" id="m-loss-lbl">Net Loss / Discount:</span>
-          <span class="val" id="m-loss-val">—</span>
-        </div>
+      <table class="modal-comp-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th class="ctr">Standard</th>
+            <th class="ctr">Customized</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="lbl">Base Rate (user/mo)</td>
+            <td class="val ctr" id="m-std-base">—</td>
+            <td class="val ctr" id="m-cust-base">—</td>
+          </tr>
+          <tr>
+            <td class="lbl">Paid Term</td>
+            <td class="val ctr" id="m-std-paid">—</td>
+            <td class="val ctr" id="m-cust-paid">—</td>
+          </tr>
+          <tr>
+            <td class="lbl">Free Months</td>
+            <td class="val ctr" id="m-std-free">—</td>
+            <td class="val ctr" id="m-cust-free">—</td>
+          </tr>
+          <tr class="highlight-row">
+            <td class="lbl">Total Access</td>
+            <td class="val ctr" id="m-std-access">—</td>
+            <td class="val ctr" id="m-cust-access">—</td>
+          </tr>
+          <tr class="highlight-row">
+            <td class="lbl">Effective Rate</td>
+            <td class="val ctr" id="m-std-eff">—</td>
+            <td class="val ctr" id="m-cust-eff">—</td>
+          </tr>
+          <tr class="divider-row"><td colspan="3"></td></tr>
+          <tr>
+            <td class="lbl">Subtotal (Excl. GST)</td>
+            <td class="val ctr" id="m-std-sub">—</td>
+            <td class="val ctr" id="m-cust-sub">—</td>
+          </tr>
+          <tr>
+            <td class="lbl">GST @ 18%</td>
+            <td class="val ctr" id="m-std-gst">—</td>
+            <td class="val ctr" id="m-cust-gst">—</td>
+          </tr>
+          <tr class="grand-row">
+            <td class="lbl">Total Payable (GST Incl.)</td>
+            <td class="val ctr" id="m-std-grand">—</td>
+            <td class="val ctr" id="m-cust-grand">—</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="loss-highlight-box" id="m-loss-box">
+        <span id="m-loss-lbl">Net Loss / Discount:</span>
+        <strong id="m-loss-val">—</strong>
       </div>
       
       <div class="modal-warning" id="m-warning" style="display:none">
-        ⚠️ This quote exceeds standard company discount limits. Do you approve this deviation?
+        ⚠️ This quote for <strong id="m-client-name">Client</strong> exceeds standard company discount limits. Do you approve this deviation?
       </div>
     </div>
     <div class="modal-footer">
