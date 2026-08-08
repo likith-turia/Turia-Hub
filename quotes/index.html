@@ -3211,11 +3211,12 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
   </div>
   <div class="field">
     <label>Users</label>
-    <input type="number" id="users" class="w-sm" value="7" min="5" max="999" oninput="update()">
+    <input type="number" id="users" class="w-sm" value="7" min="1" max="999" oninput="update()">
   </div>
   <div class="field">
     <label>Free Months</label>
     <select id="free-months" onchange="update()" style="width:75px">
+      <option value="0">0 mo</option>
       <option value="1">1 mo</option>
       <option value="2" selected>2 mo</option>
       <option value="3">3 mo</option>
@@ -3764,8 +3765,13 @@ function toggleBank(){
 }
 
 function update(){
-  var freeMonths=Math.max(1,Math.min(4,parseInt(g('free-months').value)||2));
-  var users=Math.max(5,parseInt(g('users').value)||5);
+  var freeMonths=parseInt(g('free-months').value);
+  if(isNaN(freeMonths)) freeMonths=2;
+  freeMonths=Math.max(0,Math.min(4,freeMonths));
+
+  var users=parseInt(g('users').value);
+  if(isNaN(users)) users=7;
+  users=Math.max(1,users);
   var contact=g('contact').value.trim()||'—';
   var rp=g('rep').value?g('rep').value.split('|'):['—','—','—'];
   var today=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
@@ -3787,6 +3793,7 @@ function update(){
   g('s-ann-u').textContent=users; g('s-eff').textContent=sEff;
   g('s-ann-pay').textContent=inr(sAnn); g('s-ann-tot').textContent=inr(sAnn);
   g('s-ann-gst').textContent=inr(sAnn*.18); g('s-ann-fin').textContent=inr(sAnn*1.18);
+  g('s-ann-save').style.display=freeMonths>0?'':'none';
   g('s-ann-save').textContent='✓ Save '+inr(sSave)+' — '+freeMonths+' months free — '+Math.round(freeMonths/12*100)+'% more value';
 
   // ── Growth single ──
@@ -3796,6 +3803,8 @@ function update(){
   if(g('g-ann-get'))g('g-ann-get').textContent=(12+freeMonths)+' months';
   if(g('s-ann-get'))g('s-ann-get').textContent=(12+freeMonths)+' months';
   // savings summary
+  if(g('g-savings')) g('g-savings').style.display=freeMonths>0?'':'none';
+  if(g('s-savings')) g('s-savings').style.display=freeMonths>0?'':'none';
   if(g('g-ss-get')){
     g('g-ss-get').textContent=(12+freeMonths)+' months';
     g('g-ss-rate').textContent='₹'+gEff+'/user/mo';
@@ -3810,6 +3819,7 @@ function update(){
   }
   g('g-ann-pay').textContent=inr(gAnn); g('g-ann-tot').textContent=inr(gAnn);
   g('g-ann-gst').textContent=inr(gAnn*.18); g('g-ann-fin').textContent=inr(gAnn*1.18);
+  g('g-ann-save').style.display=freeMonths>0?'':'none';
   g('g-ann-save').textContent='✓ Save '+inr(gSave)+' — '+freeMonths+' months free — '+Math.round(freeMonths/12*100)+'% more value';
 
   // ── Compare ──
@@ -3819,6 +3829,7 @@ function update(){
   g('c-s-ann-pay').textContent='Pay: '+inr(sAnn)+' (12mo)';
   g('c-s-ann-gst').textContent='+ GST: '+inr(sAnn*.18);
   g('c-s-ann-tot').textContent='Total: '+inr(sAnn*1.18)+'/yr';
+  g('c-s-ann-save').style.display=freeMonths>0?'':'none';
   g('c-s-ann-save').textContent='Save '+inr(sSave);
   g('c-g-mo-base').textContent='Base: '+inr(gMo)+'/mo';
   g('c-g-mo-gst').textContent='+ GST: '+inr(gMo*.18);
@@ -3826,6 +3837,7 @@ function update(){
   g('c-g-ann-pay').textContent='Pay: '+inr(gAnn)+' (12mo)';
   g('c-g-ann-gst').textContent='+ GST: '+inr(gAnn*.18);
   g('c-g-ann-tot').textContent='Total: '+inr(gAnn*1.18)+'/yr';
+  g('c-g-ann-save').style.display=freeMonths>0?'':'none';
   g('c-g-ann-save').textContent='Save '+inr(gSave);
   var nAmt=noticeOn?5900:0;
   g('cmp-s-grand').textContent=inr(sAnn*1.18+nAmt);
@@ -3871,7 +3883,7 @@ function update(){
     g('ps-sub').textContent=inr(gsub);
     g('ps-gst').textContent=inr(ggst);
     g('ps-grand').textContent=inr(ggrand);
-    g('ps-save').style.display='';
+    g('ps-save').style.display=freeMonths>0?'':'none';
     g('ps-save').textContent='✓ Annual plan — '+freeMonths+' months free access included';
     g('ps-bank').style.display='';
     // Update QR for Growth annual + notice
@@ -3890,7 +3902,7 @@ function update(){
     g('ps-sub').textContent=inr(sub2);
     g('ps-gst').textContent=inr(tGST);
     g('ps-grand').textContent=inr(gd2);
-    g('ps-save').style.display=billing==='annual'?'':'none';
+    g('ps-save').style.display=(billing==='annual' && freeMonths>0)?'':'none';
     g('ps-save').textContent='✓ Annual plan — '+freeMonths+' months free access included';
     g('ps-bank').style.display=bankOn?'':'none';
   }
