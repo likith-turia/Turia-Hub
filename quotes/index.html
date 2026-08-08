@@ -3997,10 +3997,10 @@ function update(){
   g('f-name').textContent=rp[0]; g('f-phone').textContent=rp[1]; g('f-email').textContent=rp[2];
 
   // Set card base prices dynamically
-  g('s-mo-price').textContent=S;
-  g('s-ann-cross').textContent=inr(S);
-  g('g-mo-price').textContent=G;
-  g('g-ann-cross').textContent=inr(G);
+  g('s-mo-price').textContent=100;
+  g('s-ann-cross').textContent=inr(100);
+  g('g-mo-price').textContent=200;
+  g('g-ann-cross').textContent=inr(200);
 
   var term1Lbl = getTermLabel(term1);
   var term2Lbl = getTermLabel(term2);
@@ -4029,7 +4029,7 @@ function update(){
   g('g-ss-pay-val').textContent = term2 + ' month' + (term2 !== 1 ? 's' : '');
   g('s-ss-pay-val').textContent = term2 + ' month' + (term2 !== 1 ? 's' : '');
 
-  var sMo=S*users*term1, gMo=G*users*term1;
+  var sMo=100*users*term1, gMo=200*users*term1;
   var sAnn=S*users*term2, gAnn=G*users*term2;
   var sSave=S*users*freeMonths, gSave=G*users*freeMonths;
   var sEff=Math.round(S*term2/(term2+freeMonths)), gEff=Math.round(G*term2/(term2+freeMonths));
@@ -4088,8 +4088,8 @@ function update(){
   g('c-g-ann-save').textContent='Save '+inr(gSave);
   
   // Set comparison base rate cell contents dynamically
-  g('c-s-mo-price').innerHTML = inr(S) + '<span style="font-size:11px;font-weight:500;color:var(--text3)">/user</span>';
-  g('c-g-mo-price').innerHTML = inr(G) + '<span style="font-size:11px;font-weight:500;color:var(--text3)">/user</span>';
+  g('c-s-mo-price').innerHTML = inr(100) + '<span style="font-size:11px;font-weight:500;color:var(--text3)">/user</span>';
+  g('c-g-mo-price').innerHTML = inr(200) + '<span style="font-size:11px;font-weight:500;color:var(--text3)">/user</span>';
   g('c-s-ann-price').innerHTML = inr(sEff) + '<span style="font-size:11px;font-weight:500;color:var(--text3)">/user eff.</span>';
   g('c-g-ann-price').innerHTML = inr(gEff) + '<span style="font-size:11px;font-weight:500;color:var(--text3)">/user eff.</span>';
 
@@ -4112,7 +4112,7 @@ function update(){
   g('sum-total').textContent=inr(grand);
 
   // ── Print page 2 ──
-  var selR=plan==='starter'?S:G;
+  var selR=plan==='starter'?(billing==='annual'?S:100):(billing==='annual'?G:200);
   var selB2=billing==='annual'?selR*users*term2:selR*users*term1;
   var selG2=selB2*.18;
   var sub2=selB2+(noticeOn?5000:0);
@@ -4200,7 +4200,8 @@ function printQuote(){
   var term = (billing === 'annual' ? term2 : term1);
   var std_free = (billing === 'annual' ? 2 : 0);
   
-  var price_loss = (S_std - (plan === 'starter' ? S : G)) * users * term;
+  var S_cust = (plan === 'starter' ? (billing === 'annual' ? S : 100) : (billing === 'annual' ? G : 200));
+  var price_loss = (S_std - S_cust) * users * term;
   var free_loss = S_std * users * (freeMonths - std_free);
   var net_loss = price_loss + free_loss;
 
@@ -4215,7 +4216,7 @@ function printQuote(){
   var stdGrand = stdSub * 1.18;
 
   // Custom Values
-  var custBase = plan === 'starter' ? S : G;
+  var custBase = plan === 'starter' ? (billing === 'annual' ? S : 100) : (billing === 'annual' ? G : 200);
   var custPaid = term;
   var custFree = freeMonths;
   var custAccess = custPaid + custFree;
@@ -4257,18 +4258,21 @@ function printQuote(){
   if (net_loss > 0) {
     lossBox.className = 'loss-highlight-box loss';
     lossLbl.textContent = 'Net Loss (Discount):';
-    lossVal.textContent = inr(net_loss);
+    lossVal.textContent = '-' + inr(net_loss);
     g('m-warning').style.display = '';
   } else {
     lossBox.className = 'loss-highlight-box profit';
     lossLbl.textContent = 'Extra Margin / Savings:';
-    lossVal.textContent = inr(Math.abs(net_loss));
+    lossVal.textContent = '+' + inr(Math.abs(net_loss));
     g('m-warning').style.display = 'none';
   }
 
   // Populate client details in header warning
   var clientName = g('contact').value.trim() || 'Client';
   g('m-client-name').textContent = clientName;
+  
+  // Set modal header text
+  g('m-header').textContent = 'Quote Authorization — ' + (plan === 'starter' ? 'Starter Plan' : 'Growth Plan');
 
   // Show modal
   g('confirm-modal').style.display = 'flex';
@@ -4297,7 +4301,7 @@ document.addEventListener('DOMContentLoaded',function(){
 <!-- CONFIRMATION MODAL -->
 <div id="confirm-modal" class="modal-overlay no-print" style="display:none">
   <div class="modal-card">
-    <div class="modal-header">Quote Authorization</div>
+    <div class="modal-header" id="m-header">Quote Authorization</div>
     <div class="modal-body">
       
       <table class="modal-comp-table">
