@@ -360,6 +360,135 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   .trial{padding:6px 12px!important;gap:8px!important}
   .tip::after,.tip::before{display:none!important}
 }
+
+/* ══ CONFIRMATION MODAL ══ */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease-out;
+}
+.modal-card {
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  width: 420px;
+  max-width: 90%;
+  overflow: hidden;
+  animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-header {
+  background: var(--purple-dark);
+  color: white;
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+.modal-body {
+  padding: 20px;
+}
+.summary-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.comparison-section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+}
+.summary-row .lbl {
+  color: var(--text2);
+}
+.summary-row .val {
+  font-weight: 600;
+  color: var(--text);
+}
+.summary-row.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 0;
+}
+.summary-row.highlight {
+  font-size: 13.5px;
+}
+.summary-row.highlight .lbl {
+  font-weight: 700;
+}
+.summary-row.highlight.loss .val {
+  color: var(--amber-mid);
+}
+.summary-row.highlight.profit .val {
+  color: var(--teal-mid);
+}
+.modal-warning {
+  background: var(--amber-bg);
+  border: 1px solid rgba(180,83,9,0.2);
+  border-radius: var(--radius);
+  color: var(--amber-dark);
+  padding: 10px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.modal-footer {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.modal-btn {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.modal-btn.cancel {
+  background: var(--border2);
+  color: var(--text2);
+}
+.modal-btn.cancel:hover {
+  background: rgba(0,0,0,0.15);
+}
+.modal-btn.confirm {
+  background: var(--purple-mid);
+  color: white;
+}
+.modal-btn.confirm:hover {
+  background: var(--purple-dark);
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(10px); }
+  to { transform: translateY(0); }
+}
 </style>
 <script>(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.QRCode = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 'use strict';
@@ -4003,6 +4132,68 @@ function update(){
 
 
 function printQuote(){
+  var freeMonths=parseInt(g('free-months').value);
+  if(isNaN(freeMonths)) freeMonths=2;
+  freeMonths=Math.max(0,Math.min(12,freeMonths));
+
+  var users=parseInt(g('users').value);
+  if(isNaN(users)) users=7;
+  users=Math.max(1,users);
+  
+  var term1=Math.max(1,parseInt(g('term1-months').value)||1);
+  var term2=Math.max(1,parseInt(g('term2-months').value)||12);
+  var S=Math.max(0,parseInt(g('starter-price').value)||0);
+  var G=Math.max(0,parseInt(g('growth-price').value)||0);
+
+  var S_std = (plan === 'starter' ? 100 : 200);
+  var term = (billing === 'annual' ? term2 : term1);
+  var std_free = (billing === 'annual' ? 2 : 0);
+  var price_loss = (S_std - (plan === 'starter' ? S : G)) * users * term;
+  var free_loss = S_std * users * (freeMonths - std_free);
+  var net_loss = price_loss + free_loss;
+
+  // Calculate totals
+  var selR = plan === 'starter' ? S : G;
+  var customTotal = selR * users * term;
+  var stdTotal = S_std * users * term;
+
+  // Populate modal fields
+  g('m-client').textContent = g('contact').value.trim() || '—';
+  g('m-plan').textContent = plan === 'starter' ? 'Starter' : 'Growth';
+  g('m-users').textContent = users + ' user' + (users !== 1 ? 's' : '');
+  g('m-term').textContent = getTermLabel(term) + (freeMonths > 0 ? ' + ' + freeMonths + ' mo free' : '');
+  g('m-price').textContent = inr(selR) + '/user/mo';
+  g('m-total').textContent = inr(customTotal) + ' (excl. GST)';
+  
+  g('m-std-rate').textContent = inr(S_std) + '/user/mo';
+  g('m-std-total').textContent = inr(stdTotal) + ' (excl. GST)';
+  
+  var lossRow = g('m-loss-row');
+  var lossLbl = g('m-loss-lbl');
+  var lossVal = g('m-loss-val');
+  
+  if (net_loss > 0) {
+    lossRow.className = 'summary-row highlight loss';
+    lossLbl.textContent = 'Net Loss (Discount):';
+    lossVal.textContent = inr(net_loss);
+    g('m-warning').style.display = '';
+  } else {
+    lossRow.className = 'summary-row highlight profit';
+    lossLbl.textContent = 'Extra Margin / Savings:';
+    lossVal.textContent = inr(Math.abs(net_loss));
+    g('m-warning').style.display = 'none';
+  }
+
+  // Show modal
+  g('confirm-modal').style.display = 'flex';
+}
+
+function closeModal() {
+  g('confirm-modal').style.display = 'none';
+}
+
+function confirmPrint() {
+  closeModal();
   var c=g('contact').value.trim();
   var orig=document.title;
   document.title='Turia-Quote-'+(c||'Client').replace(/\s+/g,'-');
@@ -4017,5 +4208,39 @@ document.addEventListener('DOMContentLoaded',function(){
   update();
 });
 </script>
+<!-- CONFIRMATION MODAL -->
+<div id="confirm-modal" class="modal-overlay no-print" style="display:none">
+  <div class="modal-card">
+    <div class="modal-header">Quote Authorization</div>
+    <div class="modal-body">
+      <div class="summary-section">
+        <div class="summary-row"><span class="lbl">Client / Contact:</span><span class="val" id="m-client">—</span></div>
+        <div class="summary-row"><span class="lbl">Plan Selected:</span><span class="val" id="m-plan">—</span></div>
+        <div class="summary-row"><span class="lbl">Users Count:</span><span class="val" id="m-users">—</span></div>
+        <div class="summary-row"><span class="lbl">Billing Term:</span><span class="val" id="m-term">—</span></div>
+        <div class="summary-row"><span class="lbl">Custom Price:</span><span class="val" id="m-price">—</span></div>
+        <div class="summary-row"><span class="lbl">Total Payable:</span><span class="val" id="m-total">—</span></div>
+      </div>
+      
+      <div class="comparison-section">
+        <div class="summary-row"><span class="lbl">Standard Rate:</span><span class="val" id="m-std-rate">—</span></div>
+        <div class="summary-row"><span class="lbl">Standard Total:</span><span class="val" id="m-std-total">—</span></div>
+        <div class="summary-row divider"></div>
+        <div class="summary-row highlight" id="m-loss-row">
+          <span class="lbl" id="m-loss-lbl">Net Loss / Discount:</span>
+          <span class="val" id="m-loss-val">—</span>
+        </div>
+      </div>
+      
+      <div class="modal-warning" id="m-warning" style="display:none">
+        ⚠️ This quote exceeds standard company discount limits. Do you approve this deviation?
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn cancel" onclick="closeModal()">No, Go Back</button>
+      <button class="modal-btn confirm" onclick="confirmPrint()">Yes, Authorize &amp; Print</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
