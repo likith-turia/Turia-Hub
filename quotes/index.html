@@ -71,17 +71,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
    ════════════════════════════════════════════ */
 .plan-card{border-radius:var(--radius-lg);border:1.5px solid var(--border);overflow:hidden;margin-bottom:12px}
 .plan-card.growth{border-color:var(--purple-border)}
+.plan-card.notice{border-color:#f59e0b}
 
 /* Plan head */
 .plan-head{padding:13px 20px 11px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between}
 .plan-card.starter .plan-head{background:var(--bg2)}
 .plan-card.growth  .plan-head{background:var(--purple-bg);border-bottom-color:var(--purple-border)}
+.plan-card.notice  .plan-head{background:#fffbeb;border-bottom-color:#f59e0b}
 .plan-badge{display:inline-flex;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:2px 8px;border-radius:20px;margin-bottom:4px}
 .plan-card.starter .plan-badge{background:var(--teal-bg);color:var(--teal-dark)}
 .plan-card.growth  .plan-badge{background:var(--purple-mid);color:white}
+.plan-card.notice  .plan-badge{background:#fef3c7;color:#d97706}
 .plan-name{font-size:17px;font-weight:800;letter-spacing:-.3px}
 .plan-card.starter .plan-name{color:var(--text)}
 .plan-card.growth  .plan-name{color:var(--purple-dark)}
+.plan-card.notice  .plan-name{color:#b45309}
 .plan-tagline{font-size:11px;color:var(--text3);margin-top:2px}
 .plan-pop{font-size:11px;font-weight:700;background:var(--purple-mid);color:white;padding:3px 10px;border-radius:20px;white-space:nowrap;align-self:flex-start}
 
@@ -91,6 +95,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .billing-col+.billing-col{border-left:1px solid var(--border)}
 .billing-col.sel{background:var(--purple-bg)}
 .plan-card.starter .billing-col.sel{background:#f2fbf8}
+.plan-card.notice .billing-col.sel{background:#fffbeb}
 
 /* Clickable billing header */
 .bc-head{display:flex;align-items:center;gap:7px;margin-bottom:9px;cursor:pointer}
@@ -98,6 +103,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .bc-sel-tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase}
 .plan-card.growth .bc-sel-tag{background:var(--purple-mid);color:white}
 .plan-card.starter .bc-sel-tag{background:var(--teal-mid);color:white}
+.plan-card.notice .bc-sel-tag{background:#f59e0b;color:white}
 
 /* Price */
 .bc-price{display:flex;align-items:baseline;gap:3px;margin-bottom:2px}
@@ -105,6 +111,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .bc-num{font-size:28px;font-weight:800;letter-spacing:-.5px;color:var(--text2)}
 .billing-col.sel .bc-sym,.billing-col.sel .bc-num{color:var(--purple-dark)}
 .plan-card.starter .billing-col.sel .bc-sym,.plan-card.starter .billing-col.sel .bc-num{color:var(--teal-dark)}
+.plan-card.notice .billing-col.sel .bc-sym,.plan-card.notice .billing-col.sel .bc-num{color:#b45309}
 .bc-cross{font-size:12px;color:var(--text3);text-decoration:line-through;margin-left:3px;align-self:center}
 .bc-per{font-size:10px;color:var(--text3);margin-bottom:10px}
 
@@ -117,6 +124,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .bc-tot .r{font-weight:800;font-size:14px}
 .billing-col.sel .bc-tot .r{color:var(--purple-dark)}
 .plan-card.starter .billing-col.sel .bc-tot .r{color:var(--teal-dark)}
+.plan-card.notice .billing-col.sel .bc-tot .r{color:#b45309}
 .bc-gst-row{margin-bottom:2px}
 .bc-gst-row .l,.bc-gst-row .r{font-size:11px;color:var(--text3);font-weight:500}
 .bc-save{display:inline-flex;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--green-bg);color:var(--green-dark);margin-top:5px}
@@ -130,6 +138,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .fc{flex-shrink:0;width:13px;height:13px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;margin-top:1px}
 .plan-card.starter .fc{background:var(--teal-bg);color:var(--teal-mid)}
 .plan-card.growth  .fc{background:var(--purple-bg);color:var(--purple-mid)}
+.plan-card.notice  .fc{background:#fef3c7;color:#d97706}
 
 /* ════════════════════════════════════════════
    COMPARE MODE
@@ -3485,8 +3494,8 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
   <!-- TO BAR -->
   <div class="q-to">
     <div><div class="q-to-lbl">Prepared for</div><div class="q-to-val" id="d-contact">—</div></div>
-    <div><div class="q-to-lbl">Users</div><div class="q-to-val" id="d-users">7 users</div></div>
-    <div><div class="q-to-lbl">Free Trial</div><div class="q-to-val">7 days</div><div class="q-to-sub">No credit card needed</div></div>
+    <div id="to-users-wrap"><div class="q-to-lbl" id="to-users-lbl">Users</div><div class="q-to-val" id="d-users">7 users</div></div>
+    <div id="to-trial-wrap"><div class="q-to-lbl">Free Trial</div><div class="q-to-val">7 days</div><div class="q-to-sub">No credit card needed</div></div>
   </div>
 
   <div class="q-body">
@@ -3628,10 +3637,52 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
             <li><span class="fc">✓</span>DSC Register</li>
             <li><span class="fc">✓</span>Attendance &amp; Leave</li>
             <li><span class="fc">✓</span>Reports</li>
-            <li><span class="fc">✓</span>5 GB Storage</li>
           </ul>
         </div>
       </div>
+
+      <!-- NOTICE STANDALONE PROPOSAL CARD -->
+      <div class="plan-card notice" id="card-notice-proposal" style="display:none">
+        <div class="plan-head">
+          <div>
+            <div class="plan-badge">Notice Management</div>
+            <div class="plan-name">Notice Management Software</div>
+            <div class="plan-tagline">Automated notice fetching, tracking, &amp; resolution across GST, TDS &amp; Income Tax portals</div>
+          </div>
+          <div class="plan-pop" style="background:#d97706">✓ Unified Sync</div>
+        </div>
+        <div class="billing-grid" style="grid-template-columns: 1fr">
+          <div class="billing-col sel" style="max-width:100%">
+            <div class="bc-head">
+              <span class="bc-label">Annual Subscription Package</span>
+              <span class="bc-sel-tag">✓ Active</span>
+            </div>
+            <div class="bc-price">
+              <span class="bc-sym">₹</span><span class="bc-num" id="n-prop-price">5,000</span>
+            </div>
+            <div class="bc-per">per year (GST exclusive)</div>
+            <div class="bc-div"></div>
+            <div class="bc-row"><span class="l">Included Sync Credits</span><span class="r" id="n-prop-credits" style="font-weight:800;color:#b45309">10,000 credits</span></div>
+            <div class="bc-row"><span class="l">Subtotal (Excl. GST)</span><span class="r" id="n-prop-sub">₹5,000</span></div>
+            <div class="bc-row bc-gst-row"><span class="l">+ 18% GST</span><span class="r" id="n-prop-gst">₹900</span></div>
+            <div class="bc-row bc-tot" style="border-top-style:dashed"><span class="l">Total payable</span><span class="r" id="n-prop-fin">₹5,900</span></div>
+          </div>
+        </div>
+        <div class="plan-feats">
+          <div class="feats-lbl">Proposal details — Features &amp; Capabilities</div>
+          <ul class="feats-cols">
+            <li><span class="fc">✓</span><strong>Unified 3-Portal Sync</strong>: Auto-checks GST, Income Tax, and TRACES (TDS) portals automatically.</li>
+            <li><span class="fc">✓</span><strong>1-Click Task Assignment</strong>: Convert any fetched notice into an assigned team task in one click.</li>
+            <li><span class="fc">✓</span><strong>Unified Deadline Calendar</strong>: Notice due dates and statutory compliance calendars combined in a single view.</li>
+            <li><span class="fc">✓</span><strong>Real-Time Status Tracker</strong>: Syncs post-fetch response filing, appeal filings, rectifications, and tax demand status.</li>
+            <li><span class="fc">✓</span><strong>Credential Error Alerts</strong>: Automated alerts for login, OTP, and authorization errors to prevent silent sync drops.</li>
+            <li><span class="fc">✓</span><strong>Scalable Performance</strong>: Manage 15 or 500+ clients with the same effortless single-sync mechanism.</li>
+            <li><span class="fc">✓</span><strong>Flexible Top-Up Credits</strong>: Purchase additional sync credits anytime at a rate of ₹0.50 per credit.</li>
+            <li><span class="fc">✓</span><strong>Client Readiness Monitor</strong>: View real-time sync eligibility status (Ready, Stale, Incomplete TAN/GSTIN) instantly.</li>
+          </ul>
+        </div>
+      </div>
+
     </div>
 
     <!-- ══ COMPARE MODE ══ -->
@@ -3937,7 +3988,8 @@ function setPlan(p){
   if (p === 'notice') {
     g('card-starter').style.display = 'none';
     g('card-growth').style.display = 'none';
-    g('notice-card').style.display = '';
+    g('card-notice-proposal').style.display = '';
+    g('notice-card').style.display = 'none';
     g('single-lbl').textContent = 'Notice Management Plan';
     
     // Hide controls that are irrelevant for Notice Only
@@ -3957,12 +4009,10 @@ function setPlan(p){
     g('mode-single').style.display = '';
     g('mode-compare').style.display = 'none';
     g('ctrl-plan-wrap').style.display = '';
-    
-    // Update notice badge
-    g('notice-card').querySelector('.notice-badge').textContent = 'Stand-alone Product Plan';
   } else {
     g('card-starter').style.display=p==='starter'?'':'none';
     g('card-growth').style.display=p==='growth'?'':'none';
+    g('card-notice-proposal').style.display = 'none';
     g('notice-card').style.display=noticeOn?'':'none';
     g('single-lbl').textContent=(p==='starter'?'Starter':'Growth')+' Plan';
     
@@ -3980,9 +4030,6 @@ function setPlan(p){
     
     // Restore mode
     setMode(mode);
-    
-    // Restore notice badge
-    g('notice-card').querySelector('.notice-badge').textContent = '+ Optional Add-on · Works with any plan';
   }
   update();
 }
@@ -4064,8 +4111,18 @@ function update(){
 
   g('q-date').textContent=today;
   g('d-contact').textContent=contact;
-  g('d-users').textContent=users+' user'+(users!==1?'s':'');
   g('f-name').textContent=rp[0]; g('f-phone').textContent=rp[1]; g('f-email').textContent=rp[2];
+
+  var isNoticePlan = (plan === 'notice');
+  if (isNoticePlan) {
+    g('to-users-lbl').textContent = 'Notice Credits';
+    g('d-users').textContent = noticeCredits.toLocaleString('en-IN');
+    g('to-trial-wrap').style.display = 'none';
+  } else {
+    g('to-users-lbl').textContent = 'Users';
+    g('d-users').textContent = users+' user'+(users!==1?'s':'');
+    g('to-trial-wrap').style.display = '';
+  }
 
   // Set card base prices dynamically
   g('s-mo-price').textContent=100;
@@ -4080,6 +4137,13 @@ function update(){
   if(g('n-credits-val')) g('n-credits-val').textContent=noticeCredits.toLocaleString('en-IN')+' sync credits included';
   if(g('n-gst-val')) g('n-gst-val').textContent='+ 18% GST: '+inr(nGST);
   if(g('n-final-val')) g('n-final-val').textContent='Total: '+inr(nFin);
+
+  // Populate standalone notice card proposal elements
+  if(g('n-prop-price')) g('n-prop-price').textContent=noticeBase.toLocaleString('en-IN');
+  if(g('n-prop-credits')) g('n-prop-credits').textContent=noticeCredits.toLocaleString('en-IN')+' credits';
+  if(g('n-prop-sub')) g('n-prop-sub').textContent=inr(noticeBase);
+  if(g('n-prop-gst')) g('n-prop-gst').textContent=inr(nGST);
+  if(g('n-prop-fin')) g('n-prop-fin').textContent=inr(nFin);
 
   var term1Lbl = getTermLabel(term1);
   var term2Lbl = getTermLabel(term2);
