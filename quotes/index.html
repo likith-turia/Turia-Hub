@@ -3389,11 +3389,11 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
     <label>Contact</label>
     <input type="text" id="contact" class="w-lg" placeholder="e.g. CA Ravi Sharma" oninput="update()">
   </div>
-  <div class="field">
+  <div class="field" id="ctrl-users-wrap">
     <label>Users</label>
     <input type="number" id="users" class="w-sm" value="7" min="1" max="999" oninput="update()">
   </div>
-  <div class="field">
+  <div class="field" id="ctrl-free-wrap">
     <label>Free Months</label>
     <select id="free-months" onchange="update()" style="width:75px">
       <option value="0">0 mo</option>
@@ -3408,21 +3408,29 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
       <option value="12">12 mo</option>
     </select>
   </div>
-  <div class="field">
+  <div class="field" id="ctrl-term1-wrap">
     <label>Term 1 (Mo)</label>
     <input type="number" id="term1-months" class="w-sm" value="1" min="1" max="99" oninput="update()" style="width:65px">
   </div>
-  <div class="field">
+  <div class="field" id="ctrl-term2-wrap">
     <label>Term 2 (Mo)</label>
     <input type="number" id="term2-months" class="w-sm" value="12" min="1" max="99" oninput="update()" style="width:65px">
   </div>
-  <div class="field">
+  <div class="field" id="ctrl-starter-price-wrap">
     <label>Starter ₹/mo</label>
     <input type="number" id="starter-price" class="w-sm" value="100" min="0" oninput="update()" style="width:75px">
   </div>
-  <div class="field">
+  <div class="field" id="ctrl-growth-price-wrap">
     <label>Growth ₹/mo</label>
     <input type="number" id="growth-price" class="w-sm" value="200" min="0" oninput="update()" style="width:75px">
+  </div>
+  <div class="field" id="ctrl-notice-price-wrap" style="display:none">
+    <label>Notice ₹/yr</label>
+    <input type="number" id="notice-price-input" class="w-sm" value="5000" min="0" oninput="update()" style="width:75px">
+  </div>
+  <div class="field" id="ctrl-notice-credits-wrap" style="display:none">
+    <label>Notice Credits</label>
+    <input type="number" id="notice-credits-input" class="w-sm" value="10000" min="0" oninput="update()" style="width:75px">
   </div>
   <div class="field">
     <label>Rep</label>
@@ -3434,7 +3442,7 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
     </select>
   </div>
   <div class="ctrl-sep"></div>
-  <div class="field">
+  <div class="field" id="ctrl-mode-wrap">
     <label>Mode</label>
     <div class="pill-group">
       <button class="pill active" id="pill-single" onclick="setMode('single')">Single Plan</button>
@@ -3446,13 +3454,14 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
     <div class="pill-group">
       <button class="pill" id="pill-starter" onclick="setPlan('starter')">Starter</button>
       <button class="pill active" id="pill-growth" onclick="setPlan('growth')">Growth</button>
+      <button class="pill" id="pill-notice" onclick="setPlan('notice')">Notice Only</button>
     </div>
   </div>
-  <div class="toggle-wrap" onclick="toggleNotice()">
+  <div class="toggle-wrap" id="ctrl-notice-wrap" onclick="toggleNotice()">
     <div class="tog" id="ntog"></div>
     <span>+ Notice</span>
   </div>
-  <div class="toggle-wrap" onclick="toggleBank()">
+  <div class="toggle-wrap" id="ctrl-bank-wrap" onclick="toggleBank()">
     <div class="tog" id="btog"></div>
     <span>Bank Details</span>
   </div>
@@ -3733,10 +3742,10 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
           <div class="notice-sub">Auto-fetch &amp; track GST, TDS &amp; IT notices.</div>
         </div>
         <div style="text-align:right">
-          <div class="notice-price">₹5,000</div>
-          <div class="notice-credits">10,000 sync credits included</div>
-          <div class="notice-gst">+ 18% GST: ₹900</div>
-          <div class="notice-final">Total: ₹5,900</div>
+          <div class="notice-price" id="n-price-val">₹5,000</div>
+          <div class="notice-credits" id="n-credits-val">10,000 sync credits included</div>
+          <div class="notice-gst" id="n-gst-val">+ 18% GST: ₹900</div>
+          <div class="notice-final" id="n-final-val">Total: ₹5,900</div>
         </div>
       </div>
       <div class="notice-body">
@@ -3838,8 +3847,8 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
           <td class="r" id="ps-pamt">₹16,800</td>
         </tr>
         <tr id="ps-nrow" style="display:none">
-          <td><div class="ps-iname">Notice Management Add-on</div><div class="ps-isub">10,000 sync credits · GST, TDS &amp; IT portal</div></td>
-          <td class="r">1</td><td class="r">₹5,000</td><td class="r">₹5,000</td>
+          <td><div class="ps-iname" id="ps-n-title">Notice Management Add-on</div><div class="ps-isub" id="ps-n-sub">10,000 sync credits · GST, TDS &amp; IT portal</div></td>
+          <td class="r">1</td><td class="r" id="ps-n-rate">₹5,000</td><td class="r" id="ps-n-amt">₹5,000</td>
         </tr>
         <tr class="sub"><td colspan="3" class="r" style="font-weight:600">Subtotal</td><td class="r" id="ps-sub">₹16,800</td></tr>
         <tr class="gst"><td colspan="3" class="r">GST @ 18%</td><td class="r" id="ps-gst">₹3,024</td></tr>
@@ -3923,9 +3932,58 @@ function setPlan(p){
   plan=p;
   g('pill-starter').classList.toggle('active',p==='starter');
   g('pill-growth').classList.toggle('active',p==='growth');
-  g('card-starter').style.display=p==='starter'?'':'none';
-  g('card-growth').style.display=p==='growth'?'':'none';
-  g('single-lbl').textContent=(p==='starter'?'Starter':'Growth')+' Plan';
+  g('pill-notice').classList.toggle('active',p==='notice');
+  
+  if (p === 'notice') {
+    g('card-starter').style.display = 'none';
+    g('card-growth').style.display = 'none';
+    g('notice-card').style.display = '';
+    g('single-lbl').textContent = 'Notice Management Plan';
+    
+    // Hide controls that are irrelevant for Notice Only
+    g('ctrl-users-wrap').style.display = 'none';
+    g('ctrl-free-wrap').style.display = 'none';
+    g('ctrl-term1-wrap').style.display = 'none';
+    g('ctrl-term2-wrap').style.display = 'none';
+    g('ctrl-starter-price-wrap').style.display = 'none';
+    g('ctrl-growth-price-wrap').style.display = 'none';
+    g('ctrl-mode-wrap').style.display = 'none';
+    g('ctrl-notice-wrap').style.display = 'none';
+    g('ctrl-notice-price-wrap').style.display = '';
+    g('ctrl-notice-credits-wrap').style.display = '';
+    
+    // Force mode to single since comparison doesn't apply
+    mode = 'single';
+    g('mode-single').style.display = '';
+    g('mode-compare').style.display = 'none';
+    g('ctrl-plan-wrap').style.display = '';
+    
+    // Update notice badge
+    g('notice-card').querySelector('.notice-badge').textContent = 'Stand-alone Product Plan';
+  } else {
+    g('card-starter').style.display=p==='starter'?'':'none';
+    g('card-growth').style.display=p==='growth'?'':'none';
+    g('notice-card').style.display=noticeOn?'':'none';
+    g('single-lbl').textContent=(p==='starter'?'Starter':'Growth')+' Plan';
+    
+    // Show regular controls
+    g('ctrl-users-wrap').style.display = '';
+    g('ctrl-free-wrap').style.display = '';
+    g('ctrl-term1-wrap').style.display = '';
+    g('ctrl-term2-wrap').style.display = '';
+    g('ctrl-starter-price-wrap').style.display = '';
+    g('ctrl-growth-price-wrap').style.display = '';
+    g('ctrl-mode-wrap').style.display = '';
+    g('ctrl-notice-wrap').style.display = '';
+    g('ctrl-notice-price-wrap').style.display = noticeOn ? '' : 'none';
+    g('ctrl-notice-credits-wrap').style.display = noticeOn ? '' : 'none';
+    
+    // Restore mode
+    setMode(mode);
+    
+    // Restore notice badge
+    g('notice-card').querySelector('.notice-badge').textContent = '+ Optional Add-on · Works with any plan';
+  }
   update();
 }
 
@@ -3955,6 +4013,11 @@ function toggleNotice(){
   g('ntog').classList.toggle('on',noticeOn);
   g('notice-card').style.display=noticeOn?'':'none';
   g('cmp-notice-row').style.display=(mode==='compare'&&noticeOn)?'':'none';
+  
+  if (plan !== 'notice') {
+    g('ctrl-notice-price-wrap').style.display = noticeOn ? '' : 'none';
+    g('ctrl-notice-credits-wrap').style.display = noticeOn ? '' : 'none';
+  }
   update();
 }
 
@@ -3987,6 +4050,14 @@ function update(){
   var S=Math.max(0,parseInt(g('starter-price').value)||0);
   var G=Math.max(0,parseInt(g('growth-price').value)||0);
 
+  var noticeBase=5000;
+  var nInput=g('notice-price-input');
+  if(nInput) noticeBase=Math.max(0,parseInt(nInput.value)||0);
+
+  var noticeCredits=10000;
+  var nCreditsInput=g('notice-credits-input');
+  if(nCreditsInput) noticeCredits=Math.max(0,parseInt(nCreditsInput.value)||0);
+
   var contact=g('contact').value.trim()||'—';
   var rp=g('rep').value?g('rep').value.split('|'):['—','—','—'];
   var today=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
@@ -4001,6 +4072,14 @@ function update(){
   g('s-ann-cross').textContent=inr(100);
   g('g-mo-price').textContent=200;
   g('g-ann-cross').textContent=inr(200);
+
+  // Set notice-card base prices dynamically
+  var nGST=noticeBase*.18;
+  var nFin=noticeBase*1.18;
+  if(g('n-price-val')) g('n-price-val').textContent=inr(noticeBase);
+  if(g('n-credits-val')) g('n-credits-val').textContent=noticeCredits.toLocaleString('en-IN')+' sync credits included';
+  if(g('n-gst-val')) g('n-gst-val').textContent='+ 18% GST: '+inr(nGST);
+  if(g('n-final-val')) g('n-final-val').textContent='Total: '+inr(nFin);
 
   var term1Lbl = getTermLabel(term1);
   var term2Lbl = getTermLabel(term2);
@@ -4093,72 +4172,115 @@ function update(){
   g('c-s-ann-price').innerHTML = inr(sEff) + '<span style="font-size:11px;font-weight:500;color:var(--text3)">/user eff.</span>';
   g('c-g-ann-price').innerHTML = inr(gEff) + '<span style="font-size:11px;font-weight:500;color:var(--text3)">/user eff.</span>';
 
-  var nAmt=noticeOn?5900:0;
+  var isNoticePlan = (plan === 'notice');
+  var nAmt = (isNoticePlan || noticeOn) ? nFin : 0;
   g('cmp-s-grand').textContent=inr(sAnn*1.18+nAmt);
   g('cmp-g-grand').textContent=inr(gAnn*1.18+nAmt);
   g('cmp-grand-lbl').textContent=noticeOn?'+ Notice add-on':'';
   g('cmp-notice-row').style.display=(mode==='compare'&&noticeOn)?'':'none';
 
   // ── Summary strip ──
-  var selBase=plan==='starter'?(billing==='annual'?sAnn:sMo):(billing==='annual'?gAnn:gMo);
-  var selTotal=selBase*1.18;
-  var grand=selTotal+(noticeOn?5900:0);
-  var modeLabel=mode==='compare'?'Compare':(plan==='starter'?'Starter':'Growth');
-  g('sum-cfg').textContent=modeLabel+' · '+getTermLabel(billing==='annual'?term2:term1)+' · '+users+' user'+(users!==1?'s':'');
-  g('sum-plan').textContent='Plan: '+inr(selTotal);
-  g('sum-notice').textContent='Notice: ₹5,900';
-  g('sum-nsep').style.display=noticeOn?'':'none';
-  g('sum-notice').style.display=noticeOn?'':'none';
+  var selBase = 0;
+  if (plan === 'starter') {
+    selBase = billing === 'annual' ? sAnn : sMo;
+  } else if (plan === 'growth') {
+    selBase = billing === 'annual' ? gAnn : gMo;
+  }
+  var selTotal = selBase*1.18;
+  var grand = selTotal + nAmt;
+  var modeLabel = mode==='compare'?'Compare':(plan==='starter'?'Starter':(plan==='notice'?'Notice Only':'Growth'));
+
+  if (isNoticePlan) {
+    g('sum-cfg').textContent = 'Notice Management Plan';
+    g('sum-plan').style.display = 'none';
+    g('sum-nsep').style.display = 'none';
+    g('sum-notice').style.display = '';
+  } else {
+    g('sum-cfg').textContent=modeLabel+' · '+getTermLabel(billing==='annual'?term2:term1)+' · '+users+' user'+(users!==1?'s':'');
+    g('sum-plan').style.display = '';
+    g('sum-plan').textContent='Plan: '+inr(selTotal);
+    g('sum-nsep').style.display=noticeOn?'':'none';
+    g('sum-notice').style.display=noticeOn?'':'none';
+  }
+  g('sum-notice').textContent='Notice: '+inr(nFin);
   g('sum-total').textContent=inr(grand);
 
   // ── Print page 2 ──
   var selR=plan==='starter'?(billing==='annual'?S:100):(billing==='annual'?G:200);
   var selB2=billing==='annual'?selR*users*term2:selR*users*term1;
   var selG2=selB2*.18;
-  var sub2=selB2+(noticeOn?5000:0);
-  var tGST=selG2+(noticeOn?900:0);
+  var sub2=selB2+(noticeOn?noticeBase:0);
+  var tGST=selG2+(noticeOn?noticeBase*0.18:0);
   var gd2=sub2+tGST;
   g('ps-date').textContent=today;
   g('ps-contact').textContent=contact;
   g('ps-users').textContent=users+' user'+(users!==1?'s':'');
-  if(mode==='compare'){
-    // Compare mode: always show Growth Annual summary
-    var gu=users,gr=G,gann=gr*gu*term2;
-    var gsub=gann+(noticeOn?5000:0);
-    var ggst=gann*0.18+(noticeOn?900:0);
-    var ggrand=gsub+ggst;
-    g('ps-plan-billing').textContent='Growth · '+getTermLabel(term2);
-    g('ps-pname').textContent='Growth Plan — '+getTermLabel(term2);
-    g('ps-psub').textContent='₹'+G+'/user/month × '+term2+' months · '+(term2+freeMonths)+' months access';
-    g('ps-pqty').textContent=gu;
-    g('ps-prate').textContent=inr(gr*term2);
-    g('ps-pamt').textContent=inr(gann);
-    g('ps-nrow').style.display=noticeOn?'':'none';
-    g('ps-sub').textContent=inr(gsub);
-    g('ps-gst').textContent=inr(ggst);
-    g('ps-grand').textContent=inr(ggrand);
-    g('ps-save').style.display=freeMonths>0?'':'none';
-    g('ps-save').textContent='✓ '+getTermLabel(term2)+' plan — '+freeMonths+' months free access included';
+
+  if (isNoticePlan) {
+    g('ps-plan-billing').textContent='Notice Only';
+    g('ps-plan-row').style.display='none';
+    g('ps-nrow').style.display='';
+    if(g('ps-n-title')) g('ps-n-title').textContent='Notice Management Plan';
+    if(g('ps-n-sub')) g('ps-n-sub').textContent=noticeCredits.toLocaleString('en-IN')+' sync credits · GST, TDS & IT portal';
+    if(g('ps-n-rate')) g('ps-n-rate').textContent=inr(noticeBase);
+    if(g('ps-n-amt')) g('ps-n-amt').textContent=inr(noticeBase);
+    g('ps-sub').textContent=inr(noticeBase);
+    g('ps-gst').textContent=inr(noticeBase*0.18);
+    g('ps-grand').textContent=inr(nFin);
+    g('ps-save').style.display='none';
     g('ps-bank').style.display='';
-    // Update QR for Growth annual + notice
-    var cmpAmt=ggrand.toFixed(2);
+    
+    // Update QR for Notice plan + notice
+    var cmpAmt=nFin.toFixed(2);
     var cmpUrl='upi://pay?pa=8722750204%40pthdfc&pn=Turiabooks%20Technologies&am='+cmpAmt+'&cu=INR&tn=Turia%20Subscription';
     if(typeof QRCode!=='undefined'){generateQR('ps-bk-qr',cmpUrl,82);}
-    var pa=document.getElementById('ps-bk-qr-amt');if(pa)pa.textContent=inr(ggrand);
+    var pa=document.getElementById('ps-bk-qr-amt');if(pa)pa.textContent=inr(nFin);
   } else {
-    g('ps-plan-billing').textContent=(plan==='starter'?'Starter':'Growth')+' · '+getTermLabel(billing==='annual'?term2:term1);
-    g('ps-pname').textContent=(plan==='starter'?'Starter':'Growth')+' Plan — '+getTermLabel(billing==='annual'?term2:term1);
-    g('ps-psub').textContent='₹'+selR+'/user/month × '+(billing==='annual'?term2:term1)+' months · '+(billing==='annual'?(term2+freeMonths):term1)+' months access';
-    g('ps-pqty').textContent=users;
-    g('ps-prate').textContent=inr(billing==='annual'?selR*term2:selR*term1);
-    g('ps-pamt').textContent=inr(selB2);
-    g('ps-nrow').style.display=noticeOn?'':'none';
-    g('ps-sub').textContent=inr(sub2);
-    g('ps-gst').textContent=inr(tGST);
-    g('ps-grand').textContent=inr(gd2);
-    g('ps-save').style.display=(billing==='annual' && freeMonths>0)?'':'none';
-    g('ps-save').textContent='✓ '+getTermLabel(term2)+' plan — '+freeMonths+' months free access included';
-    g('ps-bank').style.display=bankOn?'':'none';
+    g('ps-plan-row').style.display='';
+    if(g('ps-n-title')) g('ps-n-title').textContent='Notice Management Add-on';
+    if(g('ps-n-sub')) g('ps-n-sub').textContent=noticeCredits.toLocaleString('en-IN')+' sync credits · GST, TDS & IT portal';
+    if(g('ps-n-rate')) g('ps-n-rate').textContent=inr(noticeBase);
+    if(g('ps-n-amt')) g('ps-n-amt').textContent=inr(noticeBase);
+
+    if(mode==='compare'){
+      // Compare mode: always show Growth Annual summary
+      var gu=users,gr=G,gann=gr*gu*term2;
+      var gsub=gann+(noticeOn?noticeBase:0);
+      var ggst=gann*0.18+(noticeOn?noticeBase*0.18:0);
+      var ggrand=gsub+ggst;
+      g('ps-plan-billing').textContent='Growth · '+getTermLabel(term2);
+      g('ps-pname').textContent='Growth Plan — '+getTermLabel(term2);
+      g('ps-psub').textContent='₹'+G+'/user/month × '+term2+' months · '+(term2+freeMonths)+' months access';
+      g('ps-pqty').textContent=gu;
+      g('ps-prate').textContent=inr(gr*term2);
+      g('ps-pamt').textContent=inr(gann);
+      g('ps-nrow').style.display=noticeOn?'':'none';
+      g('ps-sub').textContent=inr(gsub);
+      g('ps-gst').textContent=inr(ggst);
+      g('ps-grand').textContent=inr(ggrand);
+      g('ps-save').style.display=freeMonths>0?'':'none';
+      g('ps-save').textContent='✓ '+getTermLabel(term2)+' plan — '+freeMonths+' months free access included';
+      g('ps-bank').style.display='';
+      // Update QR for Growth annual + notice
+      var cmpAmt=ggrand.toFixed(2);
+      var cmpUrl='upi://pay?pa=8722750204%40pthdfc&pn=Turiabooks%20Technologies&am='+cmpAmt+'&cu=INR&tn=Turia%20Subscription';
+      if(typeof QRCode!=='undefined'){generateQR('ps-bk-qr',cmpUrl,82);}
+      var pa=document.getElementById('ps-bk-qr-amt');if(pa)pa.textContent=inr(ggrand);
+    } else {
+      g('ps-plan-billing').textContent=(plan==='starter'?'Starter':'Growth')+' · '+getTermLabel(billing==='annual'?term2:term1);
+      g('ps-pname').textContent=(plan==='starter'?'Starter':'Growth')+' Plan — '+getTermLabel(billing==='annual'?term2:term1);
+      g('ps-psub').textContent='₹'+selR+'/user/month × '+(billing==='annual'?term2:term1)+' months · '+(billing==='annual'?(term2+freeMonths):term1)+' months access';
+      g('ps-pqty').textContent=users;
+      g('ps-prate').textContent=inr(billing==='annual'?selR*term2:selR*term1);
+      g('ps-pamt').textContent=inr(selB2);
+      g('ps-nrow').style.display=noticeOn?'':'none';
+      g('ps-sub').textContent=inr(sub2);
+      g('ps-gst').textContent=inr(tGST);
+      g('ps-grand').textContent=inr(gd2);
+      g('ps-save').style.display=(billing==='annual' && freeMonths>0)?'':'none';
+      g('ps-save').textContent='✓ '+getTermLabel(term2)+' plan — '+freeMonths+' months free access included';
+      g('ps-bank').style.display=bankOn?'':'none';
+    }
   }
 
     // ── DYNAMIC UPI QR (amount = grand total incl. GST) ──
@@ -4196,34 +4318,62 @@ function printQuote(){
   var S=Math.max(0,parseInt(g('starter-price').value)||0);
   var G=Math.max(0,parseInt(g('growth-price').value)||0);
 
-  var S_std = (plan === 'starter' ? 100 : 200);
-  var term = (billing === 'annual' ? term2 : term1);
-  var std_free = (billing === 'annual' ? 2 : 0);
+  var noticeBase=5000;
+  var nInput=g('notice-price-input');
+  if(nInput) noticeBase=Math.max(0,parseInt(nInput.value)||0);
+
+  var noticeCredits=10000;
+  var nCreditsInput=g('notice-credits-input');
+  if(nCreditsInput) noticeCredits=Math.max(0,parseInt(nCreditsInput.value)||0);
+
+  var isNoticePlan = (plan === 'notice');
+
+  var S_std = isNoticePlan ? 0 : (plan === 'starter' ? 100 : 200);
+  var term = isNoticePlan ? 0 : (billing === 'annual' ? term2 : term1);
+  var std_free = isNoticePlan ? 0 : (billing === 'annual' ? 2 : 0);
   
-  var S_cust = (plan === 'starter' ? (billing === 'annual' ? S : 100) : (billing === 'annual' ? G : 200));
-  var price_loss = (S_std - S_cust) * users * term;
-  var free_loss = S_std * users * (freeMonths - std_free);
-  var net_loss = price_loss + free_loss;
+  var S_cust = isNoticePlan ? 0 : (plan === 'starter' ? (billing === 'annual' ? S : 100) : (billing === 'annual' ? G : 200));
+
+  var stdNotice = (isNoticePlan || noticeOn) ? (noticeCredits * 0.5) : 0;
+  var custNotice = (isNoticePlan || noticeOn) ? noticeBase : 0;
+  
+  var price_loss = isNoticePlan ? 0 : (S_std - S_cust) * users * term;
+  var free_loss = isNoticePlan ? 0 : S_std * users * (freeMonths - std_free);
+  var notice_loss = stdNotice - custNotice;
+  
+  var net_loss = price_loss + free_loss + notice_loss;
 
   // Standard Values
   var stdBase = S_std;
   var stdPaid = term;
   var stdFree = std_free;
   var stdAccess = stdPaid + stdFree;
-  var stdEff = Math.round(stdBase * stdPaid / stdAccess);
-  var stdSub = stdBase * users * stdPaid;
+  var stdEff = isNoticePlan ? 0 : Math.round(stdBase * stdPaid / stdAccess);
+  var stdSub = (isNoticePlan ? 0 : stdBase * users * stdPaid) + stdNotice;
   var stdGst = stdSub * 0.18;
   var stdGrand = stdSub * 1.18;
 
   // Custom Values
-  var custBase = plan === 'starter' ? (billing === 'annual' ? S : 100) : (billing === 'annual' ? G : 200);
+  var custBase = S_cust;
   var custPaid = term;
-  var custFree = freeMonths;
+  var custFree = isNoticePlan ? 0 : freeMonths;
   var custAccess = custPaid + custFree;
-  var custEff = Math.round(custBase * custPaid / custAccess);
-  var custSub = custBase * users * custPaid;
+  var custEff = isNoticePlan ? 0 : Math.round(custBase * custPaid / custAccess);
+  var custSub = (isNoticePlan ? 0 : custBase * users * custPaid) + custNotice;
   var custGst = custSub * 0.18;
   var custGrand = custSub * 1.18;
+
+  // Update Core rows display logic
+  var showCore = !isNoticePlan;
+  g('m-row-base').style.display = showCore ? '' : 'none';
+  g('m-row-paid').style.display = showCore ? '' : 'none';
+  g('m-row-free').style.display = showCore ? '' : 'none';
+  g('m-row-access').style.display = showCore ? '' : 'none';
+  g('m-row-eff').style.display = showCore ? '' : 'none';
+  g('m-row-divider').style.display = showCore ? '' : 'none';
+
+  // Update Base Rate label dynamically
+  g('m-base-lbl').textContent = 'Base Rate (user/mo)';
 
   // Populate comparison table fields
   g('m-std-base').textContent = inr(stdBase);
@@ -4240,6 +4390,14 @@ function printQuote(){
   
   g('m-std-eff').textContent = inr(stdEff) + '/user/mo';
   g('m-cust-eff').textContent = inr(custEff) + '/user/mo';
+
+  // Notice Add-on row
+  var showNoticeRow = isNoticePlan || noticeOn;
+  g('m-notice-row').style.display = showNoticeRow ? '' : 'none';
+  if (showNoticeRow) {
+    g('m-std-notice').textContent = inr(stdNotice);
+    g('m-cust-notice').textContent = inr(custNotice);
+  }
   
   g('m-std-sub').textContent = inr(stdSub);
   g('m-cust-sub').textContent = inr(custSub);
@@ -4272,7 +4430,7 @@ function printQuote(){
   g('m-client-name').textContent = clientName;
   
   // Set modal header text
-  g('m-header').textContent = 'Quote Authorization — ' + (plan === 'starter' ? 'Starter Plan' : 'Growth Plan');
+  g('m-header').textContent = 'Quote Authorization — ' + (isNoticePlan ? 'Standalone Notice Plan' : (plan === 'starter' ? 'Starter Plan' : 'Growth Plan'));
 
   // Show modal
   g('confirm-modal').style.display = 'flex';
@@ -4313,32 +4471,37 @@ document.addEventListener('DOMContentLoaded',function(){
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td class="lbl">Base Rate (user/mo)</td>
+          <tr id="m-row-base">
+            <td class="lbl" id="m-base-lbl">Base Rate (user/mo)</td>
             <td class="val ctr" id="m-std-base">—</td>
             <td class="val ctr" id="m-cust-base">—</td>
           </tr>
-          <tr>
+          <tr id="m-row-paid">
             <td class="lbl">Paid Term</td>
             <td class="val ctr" id="m-std-paid">—</td>
             <td class="val ctr" id="m-cust-paid">—</td>
           </tr>
-          <tr>
+          <tr id="m-row-free">
             <td class="lbl">Free Months</td>
             <td class="val ctr" id="m-std-free">—</td>
             <td class="val ctr" id="m-cust-free">—</td>
           </tr>
-          <tr class="highlight-row">
+          <tr class="highlight-row" id="m-row-access">
             <td class="lbl">Total Access</td>
             <td class="val ctr" id="m-std-access">—</td>
             <td class="val ctr" id="m-cust-access">—</td>
           </tr>
-          <tr class="highlight-row">
+          <tr class="highlight-row" id="m-row-eff">
             <td class="lbl">Effective Rate</td>
             <td class="val ctr" id="m-std-eff">—</td>
             <td class="val ctr" id="m-cust-eff">—</td>
           </tr>
-          <tr class="divider-row"><td colspan="3"></td></tr>
+          <tr class="divider-row" id="m-row-divider"><td colspan="3"></td></tr>
+          <tr id="m-notice-row" style="display:none">
+            <td class="lbl">Notice Plan / Add-on</td>
+            <td class="val ctr" id="m-std-notice">—</td>
+            <td class="val ctr" id="m-cust-notice">—</td>
+          </tr>
           <tr>
             <td class="lbl">Subtotal (Excl. GST)</td>
             <td class="val ctr" id="m-std-sub">—</td>
