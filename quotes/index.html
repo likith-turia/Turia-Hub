@@ -3651,35 +3651,49 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
           </div>
           <div class="plan-pop" style="background:#d97706">✓ Unified Sync</div>
         </div>
-        <div class="billing-grid" style="grid-template-columns: 1fr">
-          <div class="billing-col sel" style="max-width:100%">
-            <div class="bc-head">
-              <span class="bc-label">Annual Subscription Package</span>
-              <span class="bc-sel-tag">✓ Active</span>
-            </div>
-            <div class="bc-price">
-              <span class="bc-sym">₹</span><span class="bc-num" id="n-prop-price">5,000</span>
-            </div>
-            <div class="bc-per">per year (GST exclusive)</div>
-            <div class="bc-div"></div>
-            <div class="bc-row"><span class="l">Included Sync Credits</span><span class="r" id="n-prop-credits" style="font-weight:800;color:#b45309">10,000 credits</span></div>
-            <div class="bc-row"><span class="l">Subtotal (Excl. GST)</span><span class="r" id="n-prop-sub">₹5,000</span></div>
-            <div class="bc-row bc-gst-row"><span class="l">+ 18% GST</span><span class="r" id="n-prop-gst">₹900</span></div>
-            <div class="bc-row bc-tot" style="border-top-style:dashed"><span class="l">Total payable</span><span class="r" id="n-prop-fin">₹5,900</span></div>
+        <div style="display:grid; grid-template-columns: 1.5fr 1fr;">
+          <!-- LEFT: FEATURES -->
+          <div class="plan-feats" style="border-right:1px solid var(--border); padding:20px;">
+            <div class="feats-lbl" style="margin-bottom:14px; font-size:11px;">Notice Management Capabilities</div>
+            <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:16px;">
+              <li style="display:flex; align-items:flex-start; gap:8px; font-size:12px; line-height:1.5;">
+                <span class="fc" style="background:#fef3c7; color:#d97706;">✓</span>
+                <span><strong style="color:var(--text); font-size:13px; display:block; margin-bottom:2px;">Unified 3-Portal Sync</strong>Auto-checks GST, Income Tax, and TRACES (TDS) portals automatically in a single sync check.</span>
+              </li>
+              <li style="display:flex; align-items:flex-start; gap:8px; font-size:12px; line-height:1.5;">
+                <span class="fc" style="background:#fef3c7; color:#d97706;">✓</span>
+                <span><strong style="color:var(--text); font-size:13px; display:block; margin-bottom:2px;">1-Click Task Assignment</strong>Convert any fetched notice into a tracked, assigned team task instantly.</span>
+              </li>
+              <li style="display:flex; align-items:flex-start; gap:8px; font-size:12px; line-height:1.5;">
+                <span class="fc" style="background:#fef3c7; color:#d97706;">✓</span>
+                <span><strong style="color:var(--text); font-size:13px; display:block; margin-bottom:2px;">Unified Deadline Calendar</strong>View statutory compliance filing dates and notice due dates on a single calendar screen.</span>
+              </li>
+              <li style="display:flex; align-items:flex-start; gap:8px; font-size:12px; line-height:1.5;">
+                <span class="fc" style="background:#fef3c7; color:#d97706;">✓</span>
+                <span><strong style="color:var(--text); font-size:13px; display:block; margin-bottom:2px;">Real-Time Status Tracker</strong>Monitor response submissions, appeal filings, rectifications, and tax demands continuously.</span>
+              </li>
+              <li style="display:flex; align-items:flex-start; gap:8px; font-size:12px; line-height:1.5;">
+                <span class="fc" style="background:#fef3c7; color:#d97706;">✓</span>
+                <span><strong style="color:var(--text); font-size:13px; display:block; margin-bottom:2px;">Credential Error Alerts</strong>Proactive alerts for expired logins, password changes, or OTP failures to prevent silent sync drops.</span>
+              </li>
+            </ul>
           </div>
-        </div>
-        <div class="plan-feats">
-          <div class="feats-lbl">Proposal details — Features &amp; Capabilities</div>
-          <ul class="feats-cols">
-            <li><span class="fc">✓</span><span><strong>Unified 3-Portal Sync</strong>: Auto-checks GST, Income Tax, and TRACES (TDS) portals automatically.</span></li>
-            <li><span class="fc">✓</span><span><strong>1-Click Task Assignment</strong>: Convert any fetched notice into an assigned team task in one click.</span></li>
-            <li><span class="fc">✓</span><span><strong>Unified Deadline Calendar</strong>: Notice due dates and statutory compliance calendars combined in a single view.</span></li>
-            <li><span class="fc">✓</span><span><strong>Real-Time Status Tracker</strong>: Syncs post-fetch response filing, appeal filings, rectifications, and tax demand status.</span></li>
-            <li><span class="fc">✓</span><span><strong>Credential Error Alerts</strong>: Automated alerts for login, OTP, and authorization errors to prevent silent sync drops.</span></li>
-            <li><span class="fc">✓</span><span><strong>Scalable Performance</strong>: Manage 15 or 500+ clients with the same effortless single-sync mechanism.</span></li>
-            <li><span class="fc">✓</span><span><strong>Flexible Top-Up Credits</strong>: Purchase additional sync credits anytime at a rate of ₹0.50 per credit.</span></li>
-            <li><span class="fc">✓</span><span><strong>Client Readiness Monitor</strong>: View real-time sync eligibility status (Ready, Stale, Incomplete TAN/GSTIN) instantly.</span></li>
-          </ul>
+          <!-- RIGHT: PRICING -->
+          <div class="billing-col sel" style="padding:24px; background:#fffbeb; display:flex; flex-direction:column; justify-content:center; border-left:none;">
+            <div class="bc-head" style="margin-bottom:15px; border-bottom:none; padding:0; background:none;">
+              <span class="bc-label" style="font-size:11px;">Annual Subscription Package</span>
+              <span class="bc-sel-tag" style="background:#f59e0b; color:white;">✓ Active</span>
+            </div>
+            <div class="bc-price" style="margin-bottom:2px;">
+              <span class="bc-sym">₹</span><span class="bc-num" id="n-prop-price" style="font-size:32px;">5,000</span>
+            </div>
+            <div class="bc-per" style="font-size:11px; margin-bottom:16px;">per year (GST exclusive)</div>
+            <div class="bc-div" style="margin:12px 0;"></div>
+            <div class="bc-row" style="font-size:12px; margin-bottom:6px;"><span class="l">Included Sync Credits</span><span class="r" id="n-prop-credits" style="font-weight:800; color:#b45309;">10,000 credits</span></div>
+            <div class="bc-row" style="font-size:12px; margin-bottom:6px;"><span class="l">Subtotal (Excl. GST)</span><span class="r" id="n-prop-sub">₹5,000</span></div>
+            <div class="bc-row bc-gst-row" style="font-size:11px; margin-bottom:6px;"><span class="l">+ 18% GST</span><span class="r" id="n-prop-gst">₹900</span></div>
+            <div class="bc-row bc-tot" style="border-top:1px dashed var(--border); margin-top:10px; padding-top:10px; font-size:14px;"><span class="l" style="font-weight:700;">Total Payable</span><span class="r" id="n-prop-fin" style="font-size:16px; color:#b45309; font-weight:800;">₹5,900</span></div>
+          </div>
         </div>
       </div>
 
