@@ -3433,13 +3433,17 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
     <label>Growth ₹/mo</label>
     <input type="number" id="growth-price" class="w-sm" value="200" min="0" oninput="update()" style="width:75px">
   </div>
-  <div class="field" id="ctrl-notice-price-wrap" style="display:none">
-    <label>Notice ₹/yr</label>
-    <input type="number" id="notice-price-input" class="w-sm" value="5000" min="0" oninput="update()" style="width:75px">
-  </div>
   <div class="field" id="ctrl-notice-credits-wrap" style="display:none">
     <label>Notice Credits</label>
-    <input type="number" id="notice-credits-input" class="w-sm" value="10000" min="0" oninput="update()" style="width:75px">
+    <input type="number" id="notice-credits-input" class="w-sm" value="10000" min="0" oninput="syncNoticePriceFromCreditsRate(); update()" style="width:75px">
+  </div>
+  <div class="field" id="ctrl-notice-rate-wrap" style="display:none">
+    <label>Rate/Credit (₹)</label>
+    <input type="number" id="notice-rate-input" class="w-sm" value="0.50" min="0" step="0.01" oninput="syncNoticePriceFromCreditsRate(); update()" style="width:65px">
+  </div>
+  <div class="field" id="ctrl-notice-price-wrap" style="display:none">
+    <label>Notice ₹/yr</label>
+    <input type="number" id="notice-price-input" class="w-sm" value="5000" min="0" oninput="syncNoticeRateFromCreditsPrice(); update()" style="width:75px">
   </div>
   <div class="field">
     <label>Rep</label>
@@ -3690,6 +3694,7 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
             <div class="bc-per" style="font-size:11px; margin-bottom:16px;">per year (GST exclusive)</div>
             <div class="bc-div" style="margin:12px 0;"></div>
             <div class="bc-row" style="font-size:12px; margin-bottom:6px;"><span class="l">Included Sync Credits</span><span class="r" id="n-prop-credits" style="font-weight:800; color:#b45309;">10,000 credits</span></div>
+            <div class="bc-row" style="font-size:12px; margin-bottom:6px;"><span class="l">Rate per Credit</span><span class="r" id="n-prop-rate">₹0.50 (50p)</span></div>
             <div class="bc-row" style="font-size:12px; margin-bottom:6px;"><span class="l">Subtotal (Excl. GST)</span><span class="r" id="n-prop-sub">₹5,000</span></div>
             <div class="bc-row bc-gst-row" style="font-size:11px; margin-bottom:6px;"><span class="l">+ 18% GST</span><span class="r" id="n-prop-gst">₹900</span></div>
             <div class="bc-row bc-tot" style="border-top:1px dashed var(--border); margin-top:10px; padding-top:10px; font-size:14px;"><span class="l" style="font-weight:700;">Total Payable</span><span class="r" id="n-prop-fin" style="font-size:16px; color:#b45309; font-weight:800;">₹5,900</span></div>
@@ -3913,7 +3918,7 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
         </tr>
         <tr id="ps-nrow" style="display:none">
           <td><div class="ps-iname" id="ps-n-title">Notice Management Add-on</div><div class="ps-isub" id="ps-n-sub">10,000 sync credits · GST, TDS &amp; IT portal</div></td>
-          <td class="r">1</td><td class="r" id="ps-n-rate">₹5,000</td><td class="r" id="ps-n-amt">₹5,000</td>
+          <td class="r" id="ps-n-qty">10,000</td><td class="r" id="ps-n-rate">₹0.50</td><td class="r" id="ps-n-amt">₹5,000</td>
         </tr>
         <tr class="sub"><td colspan="3" class="r" style="font-weight:600">Subtotal</td><td class="r" id="ps-sub">₹16,800</td></tr>
         <tr class="gst"><td colspan="3" class="r">GST @ 18%</td><td class="r" id="ps-gst">₹3,024</td></tr>
@@ -4017,6 +4022,7 @@ function setPlan(p){
     g('ctrl-notice-wrap').style.display = 'none';
     g('ctrl-notice-price-wrap').style.display = '';
     g('ctrl-notice-credits-wrap').style.display = '';
+    g('ctrl-notice-rate-wrap').style.display = '';
     
     // Force mode to single since comparison doesn't apply
     mode = 'single';
@@ -4041,6 +4047,7 @@ function setPlan(p){
     g('ctrl-notice-wrap').style.display = '';
     g('ctrl-notice-price-wrap').style.display = noticeOn ? '' : 'none';
     g('ctrl-notice-credits-wrap').style.display = noticeOn ? '' : 'none';
+    g('ctrl-notice-rate-wrap').style.display = noticeOn ? '' : 'none';
     
     // Restore mode
     setMode(mode);
@@ -4078,6 +4085,7 @@ function toggleNotice(){
   if (plan !== 'notice') {
     g('ctrl-notice-price-wrap').style.display = noticeOn ? '' : 'none';
     g('ctrl-notice-credits-wrap').style.display = noticeOn ? '' : 'none';
+    g('ctrl-notice-rate-wrap').style.display = noticeOn ? '' : 'none';
   }
   update();
 }
@@ -4095,6 +4103,20 @@ function getTermLabel(months) {
   if (months === 18) return '1.5 Years';
   if (months === 24) return '2 Years';
   return months + ' Months';
+}
+
+function syncNoticePriceFromCreditsRate() {
+  var creds = parseFloat(g('notice-credits-input').value) || 0;
+  var rate = parseFloat(g('notice-rate-input').value) || 0;
+  g('notice-price-input').value = Math.round(creds * rate);
+}
+
+function syncNoticeRateFromCreditsPrice() {
+  var creds = parseFloat(g('notice-credits-input').value) || 0;
+  var price = parseFloat(g('notice-price-input').value) || 0;
+  if (creds > 0) {
+    g('notice-rate-input').value = (price / creds).toFixed(2);
+  }
 }
 
 function update(){
@@ -4118,6 +4140,10 @@ function update(){
   var noticeCredits=10000;
   var nCreditsInput=g('notice-credits-input');
   if(nCreditsInput) noticeCredits=Math.max(0,parseInt(nCreditsInput.value)||0);
+
+  var noticeRate=0.50;
+  var nRateInput=g('notice-rate-input');
+  if(nRateInput) noticeRate=Math.max(0,parseFloat(nRateInput.value)||0);
 
   var contact=g('contact').value.trim()||'—';
   var rp=g('rep').value?g('rep').value.split('|'):['—','—','—'];
@@ -4164,6 +4190,7 @@ function update(){
   // Populate standalone notice card proposal elements
   if(g('n-prop-price')) g('n-prop-price').textContent=noticeBase.toLocaleString('en-IN');
   if(g('n-prop-credits')) g('n-prop-credits').textContent=noticeCredits.toLocaleString('en-IN')+' credits';
+  if(g('n-prop-rate')) g('n-prop-rate').textContent='₹' + noticeRate.toFixed(2) + ' (' + Math.round(noticeRate * 100) + 'p)';
   if(g('n-prop-sub')) g('n-prop-sub').textContent=inr(noticeBase);
   if(g('n-prop-gst')) g('n-prop-gst').textContent=inr(nGST);
   if(g('n-prop-fin')) g('n-prop-fin').textContent=inr(nFin);
@@ -4309,7 +4336,8 @@ function update(){
     g('ps-nrow').style.display='';
     if(g('ps-n-title')) g('ps-n-title').textContent='Notice Management Plan';
     if(g('ps-n-sub')) g('ps-n-sub').textContent=noticeCredits.toLocaleString('en-IN')+' sync credits · GST, TDS & IT portal';
-    if(g('ps-n-rate')) g('ps-n-rate').textContent=inr(noticeBase);
+    if(g('ps-n-qty')) g('ps-n-qty').textContent=noticeCredits.toLocaleString('en-IN');
+    if(g('ps-n-rate')) g('ps-n-rate').textContent='₹'+noticeRate.toFixed(2);
     if(g('ps-n-amt')) g('ps-n-amt').textContent=inr(noticeBase);
     g('ps-sub').textContent=inr(noticeBase);
     g('ps-gst').textContent=inr(noticeBase*0.18);
@@ -4326,7 +4354,8 @@ function update(){
     g('ps-plan-row').style.display='';
     if(g('ps-n-title')) g('ps-n-title').textContent='Notice Management Add-on';
     if(g('ps-n-sub')) g('ps-n-sub').textContent=noticeCredits.toLocaleString('en-IN')+' sync credits · GST, TDS & IT portal';
-    if(g('ps-n-rate')) g('ps-n-rate').textContent=inr(noticeBase);
+    if(g('ps-n-qty')) g('ps-n-qty').textContent=noticeCredits.toLocaleString('en-IN');
+    if(g('ps-n-rate')) g('ps-n-rate').textContent='₹'+noticeRate.toFixed(2);
     if(g('ps-n-amt')) g('ps-n-amt').textContent=inr(noticeBase);
 
     if(mode==='compare'){
@@ -4413,6 +4442,10 @@ function printQuote(){
   var nCreditsInput=g('notice-credits-input');
   if(nCreditsInput) noticeCredits=Math.max(0,parseInt(nCreditsInput.value)||0);
 
+  var noticeRate=0.50;
+  var nRateInput=g('notice-rate-input');
+  if(nRateInput) noticeRate=Math.max(0,parseFloat(nRateInput.value)||0);
+
   var isNoticePlan = (plan === 'notice');
 
   var S_std = isNoticePlan ? 0 : (plan === 'starter' ? 100 : 200);
@@ -4481,9 +4514,12 @@ function printQuote(){
   // Notice Add-on row
   var showNoticeRow = isNoticePlan || noticeOn;
   g('m-notice-row').style.display = showNoticeRow ? '' : 'none';
+  g('m-notice-rate-row').style.display = showNoticeRow ? '' : 'none';
   if (showNoticeRow) {
     g('m-std-notice').textContent = inr(stdNotice);
     g('m-cust-notice').textContent = inr(custNotice);
+    g('m-std-notice-rate').textContent = '₹0.50 (50p)';
+    g('m-cust-notice-rate').textContent = '₹' + noticeRate.toFixed(2) + ' (' + Math.round(noticeRate * 100) + 'p)';
   }
   
   g('m-std-sub').textContent = inr(stdSub);
@@ -4585,9 +4621,14 @@ document.addEventListener('DOMContentLoaded',function(){
           </tr>
           <tr class="divider-row" id="m-row-divider"><td colspan="3"></td></tr>
           <tr id="m-notice-row" style="display:none">
-            <td class="lbl">Notice Plan / Add-on</td>
+            <td class="lbl">Notice Package Base</td>
             <td class="val ctr" id="m-std-notice">—</td>
             <td class="val ctr" id="m-cust-notice">—</td>
+          </tr>
+          <tr id="m-notice-rate-row" style="display:none">
+            <td class="lbl">Notice Rate / Credit</td>
+            <td class="val ctr" id="m-std-notice-rate">—</td>
+            <td class="val ctr" id="m-cust-notice-rate">—</td>
           </tr>
           <tr>
             <td class="lbl">Subtotal (Excl. GST)</td>
