@@ -3495,7 +3495,7 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
   <div class="q-to">
     <div><div class="q-to-lbl">Prepared for</div><div class="q-to-val" id="d-contact">—</div></div>
     <div id="to-users-wrap"><div class="q-to-lbl" id="to-users-lbl">Users</div><div class="q-to-val" id="d-users">7 users</div></div>
-    <div id="to-trial-wrap"><div class="q-to-lbl">Free Trial</div><div class="q-to-val">7 days</div><div class="q-to-sub">No credit card needed</div></div>
+    <div id="to-trial-wrap"><div class="q-to-lbl" id="to-trial-lbl">Free Trial</div><div class="q-to-val" id="to-trial-val">7 days</div><div class="q-to-sub" id="to-trial-sub">No credit card needed</div></div>
   </div>
 
   <div class="q-body">
@@ -3682,7 +3682,7 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
           <div class="billing-col sel" style="padding:24px; background:#fffbeb; display:flex; flex-direction:column; justify-content:center; border-left:none;">
             <div class="bc-head" style="margin-bottom:15px; border-bottom:none; padding:0; background:none;">
               <span class="bc-label" style="font-size:11px;">Annual Subscription Package</span>
-              <span class="bc-sel-tag" style="background:#f59e0b; color:white;">✓ Active</span>
+              <span class="bc-sel-tag" style="background:#f59e0b; color:white; flex-shrink:0; white-space:nowrap;">✓ Active</span>
             </div>
             <div class="bc-price" style="margin-bottom:2px;">
               <span class="bc-sym">₹</span><span class="bc-num" id="n-prop-price" style="font-size:32px;">5,000</span>
@@ -4127,15 +4127,24 @@ function update(){
   g('d-contact').textContent=contact;
   g('f-name').textContent=rp[0]; g('f-phone').textContent=rp[1]; g('f-email').textContent=rp[2];
 
+  var nGST=noticeBase*.18;
+  var nFin=noticeBase*1.18;
+
   var isNoticePlan = (plan === 'notice');
   if (isNoticePlan) {
     g('to-users-lbl').textContent = 'Notice Credits';
     g('d-users').textContent = noticeCredits.toLocaleString('en-IN');
-    g('to-trial-wrap').style.display = 'none';
+    g('to-trial-lbl').textContent = 'Total Payable';
+    g('to-trial-val').textContent = inr(nFin);
+    g('to-trial-sub').textContent = 'GST inclusive';
+    g('to-trial-wrap').style.display = '';
     if(g('trial-banner')) g('trial-banner').style.display = 'none';
   } else {
     g('to-users-lbl').textContent = 'Users';
     g('d-users').textContent = users+' user'+(users!==1?'s':'');
+    g('to-trial-lbl').textContent = 'Free Trial';
+    g('to-trial-val').textContent = '7 days';
+    g('to-trial-sub').textContent = 'No credit card needed';
     g('to-trial-wrap').style.display = '';
     if(g('trial-banner')) g('trial-banner').style.display = '';
   }
@@ -4147,8 +4156,6 @@ function update(){
   g('g-ann-cross').textContent=inr(200);
 
   // Set notice-card base prices dynamically
-  var nGST=noticeBase*.18;
-  var nFin=noticeBase*1.18;
   if(g('n-price-val')) g('n-price-val').textContent=inr(noticeBase);
   if(g('n-credits-val')) g('n-credits-val').textContent=noticeCredits.toLocaleString('en-IN')+' sync credits included';
   if(g('n-gst-val')) g('n-gst-val').textContent='+ 18% GST: '+inr(nGST);
