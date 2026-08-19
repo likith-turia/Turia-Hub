@@ -3859,7 +3859,7 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
     </div>
 
     <!-- TRIAL -->
-    <div class="trial">
+    <div class="trial" id="trial-banner">
       <div class="trial-icon">⏱</div>
       <div>
         <div class="trial-title">7-Day Free Trial — No credit card required</div>
@@ -4132,10 +4132,12 @@ function update(){
     g('to-users-lbl').textContent = 'Notice Credits';
     g('d-users').textContent = noticeCredits.toLocaleString('en-IN');
     g('to-trial-wrap').style.display = 'none';
+    if(g('trial-banner')) g('trial-banner').style.display = 'none';
   } else {
     g('to-users-lbl').textContent = 'Users';
     g('d-users').textContent = users+' user'+(users!==1?'s':'');
     g('to-trial-wrap').style.display = '';
+    if(g('trial-banner')) g('trial-banner').style.display = '';
   }
 
   // Set card base prices dynamically
