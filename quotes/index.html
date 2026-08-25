@@ -3545,6 +3545,10 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
       <option value="3">3 mo</option>
     </select>
   </div>
+  <div class="field" id="ctrl-contract-months-wrap">
+    <label>Contract Months</label>
+    <input type="number" id="contract-months" class="w-sm" value="12" min="12" max="120" oninput="update()" style="width:70px">
+  </div>
   <div class="field" id="ctrl-notice-credits-wrap" style="display:none">
     <label>Notice Credits</label>
     <input type="number" id="notice-credits-input" class="w-sm" value="10000" min="0" oninput="syncNoticePriceFromCreditsRate(); update()" style="width:75px">
@@ -4047,6 +4051,7 @@ function onProposalTypeChange() {
     g('ctrl-slab-price-wrap').style.display = 'none';
     g('ctrl-discount-wrap').style.display = 'none';
     g('ctrl-free-months-wrap').style.display = 'none';
+    g('ctrl-contract-months-wrap').style.display = 'none';
     g('ctrl-legacy-plan-wrap').style.display = 'none';
     g('ctrl-notice-wrap').style.display = 'none';
     
@@ -4058,6 +4063,25 @@ function onProposalTypeChange() {
     g('ctrl-slab-choice-wrap').style.display = '';
     g('ctrl-slab-price-wrap').style.display = 'none';
     g('ctrl-notice-wrap').style.display = '';
+    g('ctrl-discount-wrap').style.display = '';
+    g('ctrl-contract-months-wrap').style.display = '';
+    
+    var slabIdx = 0;
+    var users = parseInt(g('users').value) || 0;
+    var isCustomEnterprise = (users > 200 && slabChoice === 'auto') || (slabChoice === 'enterprise_custom');
+    if (isCustomEnterprise) {
+      slabIdx = 7;
+    } else {
+      if (slabChoice === 'auto') {
+        slabIdx = getSelectedSlabIndex(users);
+      } else {
+        slabIdx = SLABS.findIndex(function(s) { return s.id === slabChoice; });
+      }
+    }
+    updateDiscountOptions(slabIdx);
+    
+    var isEligibleForFreeMonths = (slabIdx >= 2 || isCustomEnterprise);
+    g('ctrl-free-months-wrap').style.display = isEligibleForFreeMonths ? '' : 'none';
     
     g('ctrl-legacy-plan-wrap').style.display = (type === 'migration') ? '' : 'none';
     
@@ -4218,10 +4242,16 @@ function update(){
 
   var discountPercent = parseInt(g('slab-discount').value) || 0;
   var freeMonths = parseInt(g('slab-free-months').value) || 0;
-  var accessTerm = 12 + freeMonths;
+  var contractMonths = parseInt(g('contract-months').value) || 12;
+  if (contractMonths < 12) {
+    contractMonths = 12;
+    g('contract-months').value = 12;
+  }
+  var accessTerm = contractMonths + freeMonths;
 
-  // Slab price is strictly locked: calculated standard price minus discount %
-  var basePrice = Math.round(slabStdPrice * (1 - discountPercent / 100));
+  // Slab price is strictly locked: prorated base price for selected contract months
+  var annualDiscountedPrice = Math.round(slabStdPrice * (1 - discountPercent / 100));
+  var basePrice = Math.round(annualDiscountedPrice * (contractMonths / 12));
   g('slab-price-input').value = basePrice;
 
   var coreTotal = basePrice * 1.18;
@@ -4255,12 +4285,13 @@ function update(){
       g('new-slab-buffer').textContent = buffer > 0 ? (buffer + ' seat' + (buffer !== 1 ? 's' : '') + ' included') : 'Fully utilized';
       g('new-slab-buffer').style.color = buffer > 0 ? 'var(--green-mid)' : 'var(--text3)';
       
+      var termLabel = (contractMonths === 12) ? '1 Year (365 Days)' : (contractMonths + ' months');
       if (freeMonths > 0) {
         g('new-slab-term').textContent = accessTerm + ' months (' + freeMonths + ' mo free)';
-        g('new-slab-term-desc').textContent = 'effective for ' + accessTerm + ' months (GST exclusive)';
+        g('new-slab-term-desc').textContent = 'for ' + contractMonths + ' months paid + ' + freeMonths + ' months free (GST exclusive)';
       } else {
-        g('new-slab-term').textContent = '1 Year (365 Days)';
-        g('new-slab-term-desc').textContent = 'per year (GST exclusive)';
+        g('new-slab-term').textContent = termLabel;
+        g('new-slab-term-desc').textContent = 'for ' + contractMonths + ' months paid (GST exclusive)';
       }
 
       g('new-slab-sub').textContent = inr(basePrice);
@@ -4278,22 +4309,23 @@ function update(){
       var legacyPlan = g('legacy-plan').value;
       var legacyRate = legacyPlan === 'growth' ? 200 : 100;
       var legacyMonthly = users * legacyRate;
-      var legacyAnnualVal = legacyMonthly * 12;
+      var legacyTermSpend = legacyMonthly * contractMonths;
 
       g('mig-curr-run').textContent = users + ' Seat' + (users !== 1 ? 's' : '') + ' @ ' + inr(legacyRate) + '/mo = ' + inr(legacyMonthly) + '/month';
-      g('mig-curr-annual').textContent = 'Annualized Legacy Spend: ' + inr(legacyAnnualVal) + ' / year';
+      g('mig-curr-annual').textContent = 'Total Legacy Spend (' + contractMonths + ' mo): ' + inr(legacyTermSpend);
 
       g('mig-slab-label').textContent = slabName + ' Slab (Up to ' + slabCapacity + ' Users)';
       g('mig-price').textContent = basePrice.toLocaleString('en-IN');
       g('mig-slab-name').textContent = slabName + ' Slab';
       g('mig-slab-cap-r').textContent = 'Up to ' + slabCapacity + ' Users';
 
+      var termLabel = (contractMonths === 12) ? '1 Year (365 Days)' : (contractMonths + ' months');
       if (freeMonths > 0) {
         g('mig-term').textContent = accessTerm + ' months (' + freeMonths + ' mo free)';
         g('mig-term-desc').textContent = 'effective for ' + accessTerm + ' months (GST exclusive)';
       } else {
-        g('mig-term').textContent = '1 Year (365 Days)';
-        g('mig-term-desc').textContent = 'per year (GST exclusive)';
+        g('mig-term').textContent = termLabel;
+        g('mig-term-desc').textContent = 'effective for ' + contractMonths + ' months paid (GST exclusive)';
       }
 
       g('mig-sub').textContent = inr(basePrice);
@@ -4301,9 +4333,9 @@ function update(){
       g('mig-fin').textContent = inr(coreTotal);
 
       // Benefit list computations
-      var migSavings = legacyAnnualVal - basePrice;
-      var migSavingsPct = Math.round(migSavings / legacyAnnualVal * 100);
-      g('mig-benefit-save').textContent = 'Save ' + inr(migSavings) + ' / year (' + migSavingsPct + '% direct cost reduction)';
+      var migSavings = legacyTermSpend - basePrice;
+      var migSavingsPct = Math.round(migSavings / legacyTermSpend * 100);
+      g('mig-benefit-save').textContent = 'Save ' + inr(migSavings) + ' over ' + contractMonths + ' months (' + migSavingsPct + '% direct cost reduction)';
 
       var migBuffer = slabCapacity - users;
       g('mig-benefit-cap').textContent = migBuffer > 0 ? ('+' + migBuffer + ' additional seat' + (migBuffer !== 1 ? 's' : '') + ' included (add staff anytime at ₹0 cost)') : 'None (at capacity limit)';
@@ -4316,7 +4348,7 @@ function update(){
 
       if (migSavings > 0) {
         g('mig-savings-box').style.display = '';
-        g('mig-savings-val').textContent = 'Save ' + inr(migSavings) + ' / yr (' + migSavingsPct + '% savings)';
+        g('mig-savings-val').textContent = 'Save ' + inr(migSavings) + ' / term (' + migSavingsPct + '% savings)';
       } else {
         g('mig-savings-box').style.display = 'none';
       }
@@ -4383,11 +4415,15 @@ function update(){
     g('ps-save').style.display = 'none';
   } else {
     g('ps-users').textContent = users + ' user' + (users !== 1 ? 's' : '');
-    g('ps-plan-billing').textContent = slabName + ' Slab · ' + (freeMonths > 0 ? (accessTerm + ' months') : 'Annual');
+    var termBillingLabel = (contractMonths === 12 && freeMonths === 0) ? 'Annual' : (accessTerm + ' months');
+    g('ps-plan-billing').textContent = slabName + ' Slab · ' + termBillingLabel;
     g('ps-plan-row').style.display = '';
     
-    g('ps-pname').textContent = 'Turia Practice Annual License — ' + slabName + ' Slab';
-    g('ps-psub').textContent = 'Up to ' + slabCapacity + ' Team Members · All 23 modules · ' + (freeMonths > 0 ? (accessTerm + ' months access') : '1 Year access');
+    var termLabelP = (contractMonths === 12) ? '1-Year Term' : (contractMonths + '-Month Term');
+    g('ps-pname').textContent = 'Turia Practice License — ' + slabName + ' Slab (' + termLabelP + ')';
+    
+    var termAccessLabelP = (contractMonths === 12 && freeMonths === 0) ? '1 Year access' : (accessTerm + ' months access (' + contractMonths + ' months paid)');
+    g('ps-psub').textContent = 'Up to ' + slabCapacity + ' Team Members · All 23 modules · ' + termAccessLabelP;
     g('ps-pqty').textContent = '1';
     g('ps-prate').textContent = inr(basePrice);
     g('ps-pamt').textContent = inr(basePrice);
@@ -4474,29 +4510,35 @@ function printQuote(){
   
   var discountPercent = parseInt(g('slab-discount').value) || 0;
   var freeMonths = parseInt(g('slab-free-months').value) || 0;
-  var accessTerm = 12 + freeMonths;
+  
+  var contractMonths = parseInt(g('contract-months').value) || 12;
+  if (contractMonths < 12) contractMonths = 12;
+  var accessTerm = contractMonths + freeMonths;
   
   var basePrice = parseFloat(g('slab-price-input').value);
   if (isNaN(basePrice)) {
-    basePrice = Math.round(slabStdPrice * (1 - discountPercent / 100));
+    var annualDiscountedPrice = Math.round(slabStdPrice * (1 - discountPercent / 100));
+    basePrice = Math.round(annualDiscountedPrice * (contractMonths / 12));
   }
 
   var stdNotice = (isNoticePlan || noticeOn) ? (noticeCredits * 0.5) : 0;
   var custNotice = (isNoticePlan || noticeOn) ? noticeBase : 0;
 
+  var stdTermPrice = isNoticePlan ? 0 : Math.round(slabStdPrice * (contractMonths / 12));
+
   // Deviation computations
-  var price_loss = isNoticePlan ? 0 : (slabStdPrice - basePrice);
+  var price_loss = isNoticePlan ? 0 : (stdTermPrice - basePrice);
   var free_loss = isNoticePlan ? 0 : Math.round(slabStdPrice * (freeMonths / 12));
   var notice_loss = stdNotice - custNotice;
   
   var net_loss = price_loss + free_loss + notice_loss;
 
   // Standard (Recommended Guidelines)
-  var stdBase = isNoticePlan ? 0 : slabStdPrice;
-  var stdPaid = isNoticePlan ? 0 : 12;
+  var stdBase = isNoticePlan ? 0 : stdTermPrice;
+  var stdPaid = isNoticePlan ? 0 : contractMonths;
   var stdFree = 0;
-  var stdAccess = isNoticePlan ? 0 : 12;
-  var stdEff = isNoticePlan ? 0 : Math.round(stdBase / 12);
+  var stdAccess = isNoticePlan ? 0 : contractMonths;
+  var stdEff = isNoticePlan ? 0 : Math.round(stdBase / contractMonths);
   var stdSub = (isNoticePlan ? 0 : stdBase) + stdNotice;
   var stdGst = stdSub * 0.18;
   var stdGrand = stdSub * 1.18;
