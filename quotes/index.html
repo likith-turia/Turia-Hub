@@ -3517,7 +3517,6 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
       <option value="growth">Growth (20 Users)</option>
       <option value="professional">Professional (40 Users)</option>
       <option value="enterprise">Enterprise (60 Users)</option>
-      <option value="enterprise_plus_75">Enterprise+ (75 Users)</option>
       <option value="enterprise_plus_100">Enterprise+ (100 Users)</option>
       <option value="enterprise_plus_150">Enterprise+ (150 Users)</option>
       <option value="enterprise_plus_200">Enterprise+ (200 Users)</option>
@@ -4021,7 +4020,6 @@ var SLABS = [
   { id: 'growth', name: 'Growth', maxUsers: 20, price: 16999, profile: 'Mid-sized, rapidly scaling CA firms' },
   { id: 'professional', name: 'Professional', maxUsers: 40, price: 24999, profile: 'Large CA practices with multiple branches' },
   { id: 'enterprise', name: 'Enterprise', maxUsers: 60, price: 34999, profile: 'Enterprise-grade CA firms & audit networks' },
-  { id: 'enterprise_plus_75', name: 'Enterprise+ 75', maxUsers: 75, price: 39999, profile: 'Scale-level accounting networks' },
   { id: 'enterprise_plus_100', name: 'Enterprise+ 100', maxUsers: 100, price: 49999, profile: 'National-tier CA partnerships' },
   { id: 'enterprise_plus_150', name: 'Enterprise+ 150', maxUsers: 150, price: 64999, profile: 'Large audit networks & multi-branch groups' },
   { id: 'enterprise_plus_200', name: 'Enterprise+ 200', maxUsers: 200, price: 79999, profile: 'Top-tier enterprise accounting networks' }
@@ -4075,10 +4073,9 @@ function getSelectedSlabIndex(users) {
   if (users <= 20) return 2;
   if (users <= 40) return 3;
   if (users <= 60) return 4;
-  if (users <= 75) return 5;
-  if (users <= 100) return 6;
-  if (users <= 150) return 7;
-  return 8; // Enterprise+ 200
+  if (users <= 100) return 5;
+  if (users <= 150) return 6;
+  return 7; // Enterprise+ 200
 }
 
 function onSlabChoiceChange() {
@@ -4192,7 +4189,7 @@ function update(){
   var isCustomEnterprise = (users > 200 && slabChoice === 'auto') || (slabChoice === 'enterprise_custom');
   
   if (isCustomEnterprise) {
-    slabIdx = 8; // Enterprise+ 200 base price is the basis
+    slabIdx = 7; // Enterprise+ 200 base price is the basis
   } else {
     if (slabChoice === 'auto') {
       slabIdx = getSelectedSlabIndex(users);
@@ -4462,7 +4459,7 @@ function printQuote(){
   var slabIdx = 0;
   var isCustomEnterprise = (users > 200 && slabChoice === 'auto') || (slabChoice === 'enterprise_custom');
   if (isCustomEnterprise) {
-    slabIdx = 8;
+    slabIdx = 7;
   } else {
     if (slabChoice === 'auto') {
       slabIdx = getSelectedSlabIndex(users);
