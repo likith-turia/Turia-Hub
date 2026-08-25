@@ -370,6 +370,41 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   .tip::after,.tip::before{display:none!important}
 }
 
+.slab-savings-box {
+  background: var(--green-bg);
+  border: 1px solid var(--green-mid);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-top: 12px;
+  color: var(--green-dark);
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+.slab-savings-box strong {
+  font-size: 14px;
+  display: block;
+  color: var(--green-dark);
+  margin-top: 2px;
+}
+.mig-benefit-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mig-benefit-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--text2);
+}
+.mig-benefit-list li .fc {
+  margin-top: 2px;
+}
+
 /* ══ CONFIRMATION MODAL ══ */
 .modal-overlay {
   position: fixed;
@@ -3398,40 +3433,58 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
     <label>Contact</label>
     <input type="text" id="contact" class="w-lg" placeholder="e.g. CA Ravi Sharma" oninput="update()">
   </div>
-  <div class="field" id="ctrl-users-wrap">
-    <label>Users</label>
-    <input type="number" id="users" class="w-sm" value="7" min="1" max="999" oninput="update()">
-  </div>
-  <div class="field" id="ctrl-free-wrap">
-    <label>Free Months</label>
-    <select id="free-months" onchange="update()" style="width:75px">
-      <option value="0">0 mo</option>
-      <option value="1">1 mo</option>
-      <option value="2" selected>2 mo</option>
-      <option value="3">3 mo</option>
-      <option value="4">4 mo</option>
-      <option value="5">5 mo</option>
-      <option value="6">6 mo</option>
-      <option value="8">8 mo</option>
-      <option value="10">10 mo</option>
-      <option value="12">12 mo</option>
+  <div class="field">
+    <label>Proposal Type</label>
+    <select id="proposal-type" onchange="onProposalTypeChange(); update()" style="width:160px">
+      <option value="new" selected>New Customer Quote</option>
+      <option value="migration">Migration Proposal</option>
+      <option value="notice">Notice Only (Standalone)</option>
     </select>
   </div>
-  <div class="field" id="ctrl-term1-wrap">
-    <label>Term 1 (Mo)</label>
-    <input type="number" id="term1-months" class="w-sm" value="1" min="1" max="99" oninput="update()" style="width:65px">
+  <div class="field" id="ctrl-users-wrap">
+    <label id="lbl-users">Active Users</label>
+    <input type="number" id="users" class="w-sm" value="7" min="1" max="999" oninput="update()">
   </div>
-  <div class="field" id="ctrl-term2-wrap">
-    <label>Term 2 (Mo)</label>
-    <input type="number" id="term2-months" class="w-sm" value="12" min="1" max="99" oninput="update()" style="width:65px">
+  <div class="field" id="ctrl-legacy-plan-wrap" style="display:none">
+    <label>Legacy Plan</label>
+    <select id="legacy-plan" onchange="update()" style="width:170px">
+      <option value="growth" selected>Monthly Growth (₹200/mo)</option>
+      <option value="basic">Monthly Basic (₹100/mo)</option>
+    </select>
   </div>
-  <div class="field" id="ctrl-starter-price-wrap">
-    <label>Starter ₹/mo</label>
-    <input type="number" id="starter-price" class="w-sm" value="100" min="0" oninput="update()" style="width:75px">
+  <div class="field" id="ctrl-slab-choice-wrap">
+    <label>Slab Choice</label>
+    <select id="slab-choice" onchange="onSlabChoiceChange(); update()" style="width:150px">
+      <option value="auto" selected>Auto-Detect</option>
+      <option value="basic">Basic (5 Users)</option>
+      <option value="starter">Starter (10 Users)</option>
+      <option value="growth">Growth (20 Users)</option>
+      <option value="professional">Professional (40 Users)</option>
+      <option value="enterprise">Enterprise (60 Users)</option>
+      <option value="enterprise_custom">Enterprise Custom</option>
+    </select>
   </div>
-  <div class="field" id="ctrl-growth-price-wrap">
-    <label>Growth ₹/mo</label>
-    <input type="number" id="growth-price" class="w-sm" value="200" min="0" oninput="update()" style="width:75px">
+  <div class="field" id="ctrl-slab-price-wrap">
+    <label>Slab Price (₹)</label>
+    <input type="number" id="slab-price-input" class="w-sm" min="0" oninput="update()" style="width:90px">
+  </div>
+  <div class="field" id="ctrl-discount-wrap">
+    <label>Discount (%)</label>
+    <select id="slab-discount" onchange="updatePriceFromDiscount(); update()" style="width:75px">
+      <option value="0" selected>0%</option>
+      <option value="5">5%</option>
+      <option value="10">10%</option>
+      <option value="15">15%</option>
+    </select>
+  </div>
+  <div class="field" id="ctrl-free-months-wrap">
+    <label>Free Months</label>
+    <select id="slab-free-months" onchange="update()" style="width:75px">
+      <option value="0" selected>0 mo</option>
+      <option value="1">1 mo</option>
+      <option value="2">2 mo</option>
+      <option value="3">3 mo</option>
+    </select>
   </div>
   <div class="field" id="ctrl-notice-credits-wrap" style="display:none">
     <label>Notice Credits</label>
@@ -3455,21 +3508,6 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
     </select>
   </div>
   <div class="ctrl-sep"></div>
-  <div class="field" id="ctrl-mode-wrap">
-    <label>Mode</label>
-    <div class="pill-group">
-      <button class="pill active" id="pill-single" onclick="setMode('single')">Single Plan</button>
-      <button class="pill" id="pill-compare" onclick="setMode('compare')">Compare Both</button>
-    </div>
-  </div>
-  <div class="field" id="ctrl-plan-wrap">
-    <label>Plan</label>
-    <div class="pill-group">
-      <button class="pill" id="pill-starter" onclick="setPlan('starter')">Starter</button>
-      <button class="pill active" id="pill-growth" onclick="setPlan('growth')">Growth</button>
-      <button class="pill" id="pill-notice" onclick="setPlan('notice')">Notice Only</button>
-    </div>
-  </div>
   <div class="toggle-wrap" id="ctrl-notice-wrap" onclick="toggleNotice()">
     <div class="tog" id="ntog"></div>
     <span>+ Notice</span>
@@ -3508,140 +3546,150 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
     <div id="mode-single">
       <div class="q-sec-lbl" id="single-lbl">Growth Plan</div>
 
-      <!-- GROWTH -->
-      <div class="plan-card growth" id="card-growth">
+      <!-- NEW CUSTOMER SLAB PROPOSAL CARD -->
+      <div class="plan-card growth" id="card-new-slab" style="display:none">
         <div class="plan-head">
           <div>
-            <div class="plan-badge">Growth</div>
-            <div class="plan-name">Growth</div>
-            <div class="plan-tagline">Best for growing CA practices</div>
+            <div class="plan-badge" id="new-slab-badge">Growth Slab</div>
+            <div class="plan-name" id="new-slab-name">Growth Slab (Up to 20 Users)</div>
+            <div class="plan-tagline">100% of all features included · Unlimited clients · Priority support</div>
           </div>
-          <div class="plan-pop">⭐ 80% choose this</div>
+          <div class="plan-pop">⭐ All-Inclusive Suite</div>
         </div>
-        <!-- Both billing columns always visible; clicking selects -->
-        <div class="billing-grid">
-          <div class="billing-col bc-dim" id="bc-g-mo" onclick="setBilling('monthly')" style="cursor:pointer">
-            <div class="bc-head"><span class="bc-label" id="g-term1-lbl">Monthly</span><span class="bc-sel-tag" id="bst-g-mo" style="display:none">✓ Selected</span></div>
-            <div class="bc-price"><span class="bc-sym">₹</span><span class="bc-num" id="g-mo-price">200</span></div>
-            <div class="bc-per">per user / month</div>
-            <div class="bc-div"></div>
-            <div class="bc-row"><span class="l">Users</span><span class="r" id="g-mo-u">7</span></div>
-            <div class="bc-row bc-tot"><span class="l" id="g-mo-tot-lbl">Monthly total</span><span class="r" id="g-mo-tot">₹1,400</span></div>
-            <div class="bc-row bc-gst-row"><span class="l">+ 18% GST</span><span class="r" id="g-mo-gst">₹252</span></div>
-            <div class="bc-row bc-tot" style="border-top-style:dashed"><span class="l">Total payable</span><span class="r" id="g-mo-fin">₹1,652</span></div>
+        
+        <!-- Split details into side-by-side: left features, right pricing -->
+        <div style="display:grid; grid-template-columns: 1.5fr 1fr; border-top:1px solid var(--purple-border);">
+          <!-- LEFT: FEATURES -->
+          <div style="padding:24px; border-right:1px solid var(--purple-border);">
+            <div class="feats-lbl" style="font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px;">Unified Feature Suite — All 23 Modules Included</div>
+            <ul class="feats-cols" style="list-style:none; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:8px 16px;">
+              <li><span class="fc">✓</span>Dashboards &amp; Analytics</li>
+              <li><span class="fc">✓</span>Client Management</li>
+              <li><span class="fc">✓</span>Tasks &amp; Workflow</li>
+              <li><span class="fc">✓</span>Invoice &amp; Billing</li>
+              <li><span class="fc">✓</span>Service Catalog</li>
+              <li><span class="fc">✓</span>DSC Register</li>
+              <li><span class="fc">✓</span>Licenses Tracker</li>
+              <li><span class="fc">✓</span>Password Vault</li>
+              <li><span class="fc">✓</span>Doc Inward-Outward</li>
+              <li><span class="fc">✓</span>Attendance &amp; Leave</li>
+              <li><span class="fc">✓</span>Leads &amp; Inquiries</li>
+              <li><span class="fc">✓</span>Client Portal</li>
+              <li><span class="fc">✓</span>WhatsApp Automation</li>
+              <li><span class="fc">✓</span>Email Integration</li>
+              <li><span class="fc">✓</span>Multi-Billing Org</li>
+              <li><span class="fc">✓</span>Sprint &amp; Resource Planner</li>
+              <li><span class="fc">✓</span>Reminders Manager</li>
+              <li><span class="fc">✓</span>Task Escalations</li>
+              <li><span class="fc">✓</span>Team Chat &amp; Bots</li>
+              <li><span class="fc">✓</span>Turia Compliance Calendar</li>
+              <li><span class="fc">✓</span>Personal &amp; Team Todos</li>
+              <li><span class="fc">✓</span>Geo-Location Tracking</li>
+            </ul>
           </div>
-          <div class="billing-col sel" id="bc-g-ann" onclick="setBilling('annual')" style="cursor:pointer">
-            <div class="bc-head"><span class="bc-label" id="g-term2-lbl">Annual</span><span class="bc-sel-tag" id="bst-g-ann">✓ Selected</span></div>
-            <div class="bc-price"><span class="bc-sym">₹</span><span class="bc-num" id="g-eff">171</span><span class="bc-cross" id="g-ann-cross">₹200</span></div>
-            <div class="bc-per">effective per user / month</div>
-            <div class="bc-div"></div>
-            <div class="bc-row"><span class="l">Users</span><span class="r" id="g-ann-u">7</span></div>
-            <div class="bc-row"><span class="l" id="g-ann-pay-lbl">Pay (12 months)</span><span class="r" id="g-ann-pay">₹16,800</span></div>
-            <div class="bc-row"><span class="l">Get</span><span class="r" id="g-ann-get" style="font-weight:800;color:var(--purple-dark)">14 months</span></div>
-            <div class="bc-row bc-tot"><span class="l" id="g-ann-tot-lbl">Annual total</span><span class="r" id="g-ann-tot">₹16,800</span></div>
-            <div class="bc-row bc-gst-row"><span class="l">+ 18% GST</span><span class="r" id="g-ann-gst">₹3,024</span></div>
-            <div class="bc-row bc-tot" style="border-top-style:dashed"><span class="l">Total payable</span><span class="r" id="g-ann-fin">₹19,824</span></div>
-            <div class="bc-save" id="g-ann-save">✓ Save ₹2,800 (2 months free)</div>
-            <div class="savings-summary" id="g-savings">
-              <div class="ss-row"><span class="ss-lbl">You pay for</span><span class="ss-val" id="g-ss-pay-val">12 months</span></div>
-              <div class="ss-row"><span class="ss-lbl">You get access for</span><span class="ss-val" id="g-ss-get">14 months</span></div>
-              <div class="ss-divider"></div>
-              <div class="ss-row"><span class="ss-lbl">Effective rate</span><span class="ss-val" id="g-ss-rate">₹171/user/mo</span></div>
-              <div class="ss-highlight">
-                <span class="ss-hl-lbl">You get more than you pay for</span>
-                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                  <span class="ss-hl-val" id="g-ss-saved">₹2,800</span>
-                  <span class="tip" style="background:rgba(255,255,255,.18);color:white;font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;letter-spacing:.02em" id="g-ss-pct" data-tip="2 free months ÷ 12 paid months = 17%. You get 17% more access than what you actually paid for.">17% more value</span>
-                </div>
-              </div>
-            <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:4px;text-align:right;letter-spacing:.03em">ⓘ hover % to see how it's calculated</div>
+          
+          <!-- RIGHT: PRICING -->
+          <div class="billing-col sel" style="padding:24px; background:#fbfbfe; display:flex; flex-direction:column; justify-content:center; border-left:none;">
+            <div class="bc-head" style="margin-bottom:15px; border-bottom:none; padding:0; background:none;">
+              <span class="bc-label" style="font-size:11px;" id="new-slab-pricing-lbl">Annual Subscription Package</span>
+              <span class="bc-sel-tag" style="background:var(--purple-mid); color:white; flex-shrink:0; white-space:nowrap;">✓ Active</span>
+            </div>
+            <div class="bc-price" style="margin-bottom:2px;">
+              <span class="bc-sym">₹</span><span class="bc-num" id="new-slab-price">16,999</span>
+            </div>
+            <div class="bc-per" id="new-slab-term-desc">per year (GST exclusive)</div>
+            <div class="bc-div" style="margin:12px 0;"></div>
+            
+            <div class="bc-row"><span class="l">User Capacity</span><span class="r" id="new-slab-cap">Up to 20 Users</span></div>
+            <div class="bc-row"><span class="l">Active Seats</span><span class="r" id="new-slab-active-u">7 Users</span></div>
+            <div class="bc-row"><span class="l">Buffer Seats Available</span><span class="r" id="new-slab-buffer" style="font-weight:800;color:var(--purple-dark)">13 seats free</span></div>
+            <div class="bc-row"><span class="l">Term Duration</span><span class="r" id="new-slab-term">1 Year (365 Days)</span></div>
+            
+            <div class="bc-div" style="margin:12px 0; border-top-style:dashed;"></div>
+            <div class="bc-row"><span class="l">Subtotal</span><span class="r" id="new-slab-sub">₹16,999</span></div>
+            <div class="bc-row bc-gst-row"><span class="l">+ 18% GST</span><span class="r" id="new-slab-gst">₹3,059.82</span></div>
+            <div class="bc-row bc-tot" style="border-top:1px dashed var(--purple-border); padding-top:6px; margin-top:4px;"><span class="l">Total Payable</span><span class="r" id="new-slab-fin">₹20,058.82</span></div>
+            
+            <!-- Net Savings highlight box -->
+            <div class="slab-savings-box" id="new-slab-savings-box">
+              <span id="new-slab-savings-lbl">Net Annual Savings</span>
+              <strong id="new-slab-savings-val">Save ₹14,201 / yr (45% savings)</strong>
             </div>
           </div>
-        </div>
-        <div class="plan-feats">
-          <div class="feats-lbl">All Features Included</div>
-          <ul class="feats-cols">
-            <li><span class="fc">✓</span>Dashboards</li>
-            <li><span class="fc">✓</span>Client Management</li>
-            <li><span class="fc">✓</span>Tasks &amp; Recurring Tasks</li>
-            <li><span class="fc">✓</span>Invoice &amp; Billing</li>
-            <li><span class="fc">✓</span>DSC Register</li>
-            <li><span class="fc">✓</span>Attendance &amp; Leave</li>
-            <li><span class="fc">✓</span>Reports</li>
-            <li><span class="fc">✓</span>WhatsApp Business</li>
-            <li><span class="fc">✓</span>Email Integration</li>
-            <li><span class="fc">✓</span>Automations &amp; Workflows</li>
-            <li><span class="fc">✓</span>Multi Billing Org</li>
-            <li><span class="fc">✓</span>Sprint Planner</li>
-            <li><span class="fc">✓</span>Action Center</li>
-            <li><span class="fc">✓</span>Chat &amp; Bots</li>
-            <li><span class="fc">✓</span>Turia Calendar · Todo</li>
-            <li><span class="fc">✓</span>Geo Location Attendance</li>
-            <li><span class="fc">✓</span>Reminders Manager</li>
-            <li><span class="fc">✓</span>25 GB Storage</li>
-          </ul>
         </div>
       </div>
 
-      <!-- STARTER -->
-      <div class="plan-card starter" id="card-starter" style="display:none">
-        <div class="plan-head">
+      <!-- LEGACY MONTHLY TO ANNUAL MIGRATION PROPOSAL CARD -->
+      <div class="plan-card starter" id="card-migration" style="display:none; border-color:var(--teal-mid);">
+        <div class="plan-head" style="background:var(--teal-bg);">
           <div>
-            <div class="plan-badge">Starter</div>
-            <div class="plan-name">Starter</div>
-            <div class="plan-tagline">Perfect for small CA firms getting started</div>
+            <div class="plan-badge" style="background:var(--teal-dark); color:white;">Migration Proposal</div>
+            <div class="plan-name" style="color:var(--teal-dark);" id="mig-title">Legacy Monthly to Annual Slab Migration</div>
+            <div class="plan-tagline">Convert monthly plan to locked-in annual capacity &amp; unlock all features</div>
           </div>
+          <div class="plan-pop" style="background:var(--teal-dark); color:white;">✓ Guaranteed Savings</div>
         </div>
-        <div class="billing-grid">
-          <div class="billing-col bc-dim" id="bc-s-mo" onclick="setBilling('monthly')" style="cursor:pointer">
-            <div class="bc-head"><span class="bc-label" id="s-term1-lbl">Monthly</span><span class="bc-sel-tag" id="bst-s-mo" style="display:none">✓ Selected</span></div>
-            <div class="bc-price"><span class="bc-sym">₹</span><span class="bc-num" id="s-mo-price">100</span></div>
-            <div class="bc-per">per user / month</div>
-            <div class="bc-div"></div>
-            <div class="bc-row"><span class="l">Users</span><span class="r" id="s-mo-u">7</span></div>
-            <div class="bc-row bc-tot"><span class="l" id="s-mo-tot-lbl">Monthly total</span><span class="r" id="s-mo-tot">₹700</span></div>
-            <div class="bc-row bc-gst-row"><span class="l">+ 18% GST</span><span class="r" id="s-mo-gst">₹126</span></div>
-            <div class="bc-row bc-tot" style="border-top-style:dashed"><span class="l">Total payable</span><span class="r" id="s-mo-fin">₹826</span></div>
+        
+        <!-- Split details into side-by-side -->
+        <div style="display:grid; grid-template-columns: 1.2fr 1fr; border-top:1px solid var(--teal-mid);">
+          <!-- LEFT: CURRENT VS PROPOSED BENEFIT SUMMARY -->
+          <div style="padding:24px; border-right:1px solid var(--teal-mid);">
+            <div class="feats-lbl" style="font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px;">Head-to-Head Comparison &amp; Benefits</div>
+            
+            <div style="background:var(--bg2); border:1px solid var(--border2); border-radius:var(--radius); padding:12px 14px; margin-bottom:14px;">
+              <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text3); letter-spacing:.05em; margin-bottom:4px;">Current Legacy Run-Rate</div>
+              <div style="font-size:16px; font-weight:700; color:var(--text);" id="mig-curr-run">8 Seats @ ₹200/mo = ₹1,600/month</div>
+              <div style="font-size:12px; color:var(--text2); margin-top:2px;" id="mig-curr-annual">Annualized Legacy Spend: ₹19,200.00 / year</div>
+            </div>
+
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text3); letter-spacing:.05em; margin-bottom:4px;">Proposed Migration Benefits</div>
+            <ul class="mig-benefit-list">
+              <li>
+                <span class="fc" style="background:var(--teal-bg); color:var(--teal-dark)">✓</span>
+                <span><strong style="color:var(--text); display:block;">Direct Annual Base Savings</strong><span id="mig-benefit-save">Save ₹9,201.00 / year (48% direct cost reduction)</span></span>
+              </li>
+              <li>
+                <span class="fc" style="background:var(--teal-bg); color:var(--teal-dark)">✓</span>
+                <span><strong style="color:var(--text); display:block;">Capacity Expansion</strong><span id="mig-benefit-cap">+2 free buffer seats (upgraded from 8 to 10 user limit)</span></span>
+              </li>
+              <li>
+                <span class="fc" style="background:var(--teal-bg); color:var(--teal-dark)">✓</span>
+                <span><strong style="color:var(--text); display:block;">Full Feature Suite Unlocked</strong><span id="mig-benefit-feat">100% access to all 23 modules, with zero premium feature restrictions</span></span>
+              </li>
+              <li>
+                <span class="fc" style="background:var(--teal-bg); color:var(--teal-dark)">✓</span>
+                <span><strong style="color:var(--text); display:block;">Price Protection Lock</strong><span>Base rate locked in for 1 full year with zero mid-term price hikes</span></span>
+              </li>
+            </ul>
           </div>
-          <div class="billing-col sel" id="bc-s-ann" onclick="setBilling('annual')" style="cursor:pointer">
-            <div class="bc-head"><span class="bc-label" id="s-term2-lbl">Annual</span><span class="bc-sel-tag" id="bst-s-ann">✓ Selected</span></div>
-            <div class="bc-price"><span class="bc-sym">₹</span><span class="bc-num" id="s-eff">86</span><span class="bc-cross" id="s-ann-cross">₹100</span></div>
-            <div class="bc-per">effective per user / month</div>
-            <div class="bc-div"></div>
-            <div class="bc-row"><span class="l">Users</span><span class="r" id="s-ann-u">7</span></div>
-            <div class="bc-row"><span class="l" id="s-ann-pay-lbl">Pay (12 months)</span><span class="r" id="s-ann-pay">₹8,400</span></div>
-            <div class="bc-row"><span class="l">Get</span><span class="r" id="s-ann-get" style="font-weight:800;color:var(--teal-dark)">14 months</span></div>
-            <div class="bc-row bc-tot"><span class="l" id="s-ann-tot-lbl">Annual total</span><span class="r" id="s-ann-tot">₹8,400</span></div>
-            <div class="bc-row bc-gst-row"><span class="l">+ 18% GST</span><span class="r" id="s-ann-gst">₹1,512</span></div>
-            <div class="bc-row bc-tot" style="border-top-style:dashed"><span class="l">Total payable</span><span class="r" id="s-ann-fin">₹9,912</span></div>
-            <div class="bc-save" id="s-ann-save">✓ Save ₹1,400 (2 months free)</div>
-            <div class="savings-summary" id="s-savings">
-              <div class="ss-row"><span class="ss-lbl">You pay for</span><span class="ss-val" id="s-ss-pay-val">12 months</span></div>
-              <div class="ss-row"><span class="ss-lbl">You get access for</span><span class="ss-val" id="s-ss-get">14 months</span></div>
-              <div class="ss-divider"></div>
-              <div class="ss-row"><span class="ss-lbl">Effective rate</span><span class="ss-val" id="s-ss-rate">₹86/user/mo</span></div>
-              <div class="ss-highlight">
-                <span class="ss-hl-lbl">You get more than you pay for</span>
-                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                  <span class="ss-hl-val" id="s-ss-saved">₹1,400</span>
-                  <span class="tip" style="background:rgba(255,255,255,.18);color:white;font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;letter-spacing:.02em" id="s-ss-pct" data-tip="2 free months ÷ 12 paid months = 17%. You get 17% more access than what you actually paid for.">17% more value</span>
-                </div>
-              </div>
-            <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:4px;text-align:right;letter-spacing:.03em">ⓘ hover % to see how it's calculated</div>
+          
+          <!-- RIGHT: PRICING -->
+          <div class="billing-col sel" style="padding:24px; background:#f2fbf8; display:flex; flex-direction:column; justify-content:center; border-left:none;">
+            <div class="bc-head" style="margin-bottom:15px; border-bottom:none; padding:0; background:none;">
+              <span class="bc-label" style="font-size:11px; color:var(--teal-dark);" id="mig-slab-label">Starter Slab (Up to 10 Users)</span>
+              <span class="bc-sel-tag" style="background:var(--teal-mid); color:white; flex-shrink:0; white-space:nowrap;">✓ Proposed</span>
+            </div>
+            <div class="bc-price" style="margin-bottom:2px;">
+              <span class="bc-sym" style="color:var(--teal-dark)">₹</span><span class="bc-num" id="mig-price" style="color:var(--teal-dark)">9,999</span>
+            </div>
+            <div class="bc-per" style="color:var(--teal-mid);" id="mig-term-desc">per year (GST exclusive)</div>
+            <div class="bc-div" style="margin:12px 0; border-top-color:var(--teal-mid);"></div>
+            
+            <div class="bc-row"><span class="l">New Slab Package</span><span class="r" id="mig-slab-name">Starter Slab</span></div>
+            <div class="bc-row"><span class="l">Included Seats</span><span class="r" id="mig-slab-cap-r">Up to 10 Users</span></div>
+            <div class="bc-row"><span class="l">Term Duration</span><span class="r" id="mig-term">1 Year (365 Days)</span></div>
+            
+            <div class="bc-div" style="margin:12px 0; border-top-style:dashed; border-top-color:var(--teal-mid);"></div>
+            <div class="bc-row"><span class="l">Proposed Base Price</span><span class="r" id="mig-sub" style="color:var(--teal-dark)">₹9,999</span></div>
+            <div class="bc-row bc-gst-row"><span class="l">+ 18% GST</span><span class="r" id="mig-gst" style="color:var(--teal-dark)">₹1,799.82</span></div>
+            <div class="bc-row bc-tot" style="border-top:1px dashed var(--teal-mid); padding-top:6px; margin-top:4px;"><span class="l">Total Payable</span><span class="r" id="mig-fin" style="color:var(--teal-dark); font-weight:800;">₹11,798.82</span></div>
+            
+            <!-- Net Savings highlight box -->
+            <div class="slab-savings-box" style="background:var(--green-bg); border-color:var(--green-mid); color:var(--green-dark);" id="mig-savings-box">
+              <span>Direct Annual Savings</span>
+              <strong id="mig-savings-val" style="color:var(--green-dark);">Save ₹9,201 / yr (48% savings)</strong>
             </div>
           </div>
-        </div>
-        <div class="plan-feats">
-          <div class="feats-lbl">What's included</div>
-          <ul class="feats-cols">
-            <li><span class="fc">✓</span>Dashboards</li>
-            <li><span class="fc">✓</span>Client Management</li>
-            <li><span class="fc">✓</span>Tasks &amp; Recurring Tasks</li>
-            <li><span class="fc">✓</span>Invoice &amp; Billing</li>
-            <li><span class="fc">✓</span>DSC Register</li>
-            <li><span class="fc">✓</span>Attendance &amp; Leave</li>
-            <li><span class="fc">✓</span>Reports</li>
-          </ul>
         </div>
       </div>
 
@@ -3709,102 +3757,7 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
 
     </div>
 
-    <!-- ══ COMPARE MODE ══ -->
-    <div id="mode-compare" style="display:none">
-      <div class="q-sec-lbl">Starter vs Growth — Full Comparison</div>
-      <div class="compare-card">
 
-        <!-- Plan headers -->
-        <div class="cg hdr">
-          <div class="cc"></div>
-          <div class="cc ctr"><div class="c-pname">Starter</div><div class="c-psub">Perfect for small CA firms</div></div>
-          <div class="cc ctr gcol"><div class="c-badge">⭐ 80% choose this</div><div class="c-pname g">Growth</div><div class="c-psub">Best for growing practices</div></div>
-        </div>
-
-        <!-- Monthly pricing -->
-        <div class="cg">
-          <div class="cc" style="font-weight:700;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center" id="c-term1-lbl">Monthly</div>
-          <div class="cc ctr">
-            <div class="c-pblock">
-              <div class="c-pmain" id="c-s-mo-price">₹100<span style="font-size:11px;font-weight:500;color:var(--text3)">/user</span></div>
-              <div class="c-psub2" id="c-s-mo-base">Base: ₹700/mo</div>
-              <div class="c-psub2" id="c-s-mo-gst">+ GST: ₹126</div>
-              <div class="c-ptotal" id="c-s-mo-tot">Total: ₹826/mo</div>
-            </div>
-          </div>
-          <div class="cc ctr gcol">
-            <div class="c-pblock">
-              <div class="c-pmain g" id="c-g-mo-price">₹200<span style="font-size:11px;font-weight:500;color:var(--text3)">/user</span></div>
-              <div class="c-psub2" id="c-g-mo-base">Base: ₹1,400/mo</div>
-              <div class="c-psub2" id="c-g-mo-gst">+ GST: ₹252</div>
-              <div class="c-ptotal g" id="c-g-mo-tot">Total: ₹1,652/mo</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Annual pricing -->
-        <div class="cg alt">
-          <div class="cc" style="font-weight:700;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:5px" id="c-term2-lbl">Annual<span style="background:var(--green-bg);color:var(--green-dark);font-size:9px;padding:1px 5px;border-radius:10px;font-weight:700">Best value</span></div>
-          <div class="cc ctr">
-            <div class="c-pblock">
-              <div class="c-pmain" id="c-s-ann-price">₹86<span style="font-size:11px;font-weight:500;color:var(--text3)">/user eff.</span></div>
-              <div class="c-psub2" id="c-s-ann-pay">Pay: ₹8,400 (12mo)</div>
-              <div class="c-psub2" id="c-s-ann-gst">+ GST: ₹1,512</div>
-              <div class="c-ptotal" id="c-s-ann-tot">Total: ₹9,912/yr</div>
-              <div class="c-psave" id="c-s-ann-save">Save ₹1,400</div>
-            </div>
-          </div>
-          <div class="cc ctr gcol">
-            <div class="c-pblock">
-              <div class="c-pmain g" id="c-g-ann-price">₹171<span style="font-size:11px;font-weight:500;color:var(--text3)">/user eff.</span></div>
-              <div class="c-psub2" id="c-g-ann-pay">Pay: ₹16,800 (12mo)</div>
-              <div class="c-psub2" id="c-g-ann-gst">+ GST: ₹3,024</div>
-              <div class="c-ptotal g" id="c-g-ann-tot">Total: ₹19,824/yr</div>
-              <div class="c-psave" id="c-g-ann-save">Save ₹2,800</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Notice row -->
-        <div class="cg" id="cmp-notice-row" style="display:none">
-          <div class="cc" style="font-weight:700;font-size:10px;color:var(--amber-mid);text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center">+ Notice Add-on</div>
-          <div class="cc ctr"><div style="font-size:11px;color:var(--text2)">₹5,000 + GST ₹900</div><div style="font-size:12px;font-weight:700;color:var(--amber-dark)">= ₹5,900</div></div>
-          <div class="cc ctr gcol"><div style="font-size:11px;color:var(--text2)">₹5,000 + GST ₹900</div><div style="font-size:12px;font-weight:700;color:var(--amber-dark)">= ₹5,900</div></div>
-        </div>
-
-        <!-- Grand total row -->
-        <div class="cg grand">
-          <div class="cc" style="font-weight:700">Grand Total <span id="cmp-grand-lbl" style="font-weight:400;font-size:10px;opacity:.5"></span></div>
-          <div class="cc ctr"><span class="grand-amt" id="cmp-s-grand">₹9,912</span><div class="grand-sub">incl. GST</div></div>
-          <div class="cc ctr gcol"><span class="grand-amt" id="cmp-g-grand">₹19,824</span><div class="grand-sub">incl. GST</div></div>
-        </div>
-
-        <!-- Core features -->
-        <div class="cg sec"><div class="cc">Core Features</div><div class="cc"></div><div class="cc gcol"></div></div>
-        <div class="cg"><div class="cc">Dashboards</div><div class="cc ctr chk">✓</div><div class="cc ctr gcol chk">✓</div></div>
-        <div class="cg alt"><div class="cc">Client Management</div><div class="cc ctr chk">✓</div><div class="cc ctr gcol chk">✓</div></div>
-        <div class="cg"><div class="cc">Tasks &amp; Recurring Tasks</div><div class="cc ctr chk">✓</div><div class="cc ctr gcol chk">✓</div></div>
-        <div class="cg alt"><div class="cc">Invoice &amp; Billing</div><div class="cc ctr chk">✓</div><div class="cc ctr gcol chk">✓</div></div>
-        <div class="cg"><div class="cc">DSC Register</div><div class="cc ctr chk">✓</div><div class="cc ctr gcol chk">✓</div></div>
-        <div class="cg alt"><div class="cc">Attendance &amp; Leave</div><div class="cc ctr chk">✓</div><div class="cc ctr gcol chk">✓</div></div>
-        <div class="cg"><div class="cc">Reports</div><div class="cc ctr chk">✓</div><div class="cc ctr gcol chk">✓</div></div>
-        <div class="cg alt"><div class="cc">Storage</div><div class="cc ctr">5 GB</div><div class="cc ctr gcol chl">25 GB</div></div>
-
-        <!-- Growth only -->
-        <div class="cg sec"><div class="cc">Growth Only</div><div class="cc"></div><div class="cc gcol"></div></div>
-        <div class="cg"><div class="cc">WhatsApp Business</div><div class="cc ctr crs">–</div><div class="cc ctr gcol chk">✓</div></div>
-        <div class="cg alt"><div class="cc">Email Integration</div><div class="cc ctr crs">–</div><div class="cc ctr gcol chk">✓</div></div>
-        <div class="cg"><div class="cc">Automations &amp; Workflows</div><div class="cc ctr crs">–</div><div class="cc ctr gcol chk">✓</div></div>
-        <div class="cg alt"><div class="cc">Sprint Planner</div><div class="cc ctr crs">–</div><div class="cc ctr gcol chk">✓</div></div>
-        <div class="cg"><div class="cc">Chat &amp; Bots</div><div class="cc ctr crs">–</div><div class="cc ctr gcol chk">✓</div></div>
-        <div class="cg alt"><div class="cc">Geo Location Attendance</div><div class="cc ctr crs">–</div><div class="cc ctr gcol chk">✓</div></div>
-        <div class="cg"><div class="cc">Multi Billing Org</div><div class="cc ctr crs">–</div><div class="cc ctr gcol chk">✓</div></div>
-        <div class="cg alt"><div class="cc">Action Center</div><div class="cc ctr crs">–</div><div class="cc ctr gcol chk">✓</div></div>
-        <div class="cg"><div class="cc">Turia Calendar · Todo</div><div class="cc ctr crs">–</div><div class="cc ctr gcol chk">✓</div></div>
-        <div class="cg alt"><div class="cc">Reminders Manager</div><div class="cc ctr crs">–</div><div class="cc ctr gcol chk">✓</div></div>
-
-      </div>
-    </div>
 
 
 
@@ -3989,106 +3942,88 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
     });
   }
 
-var mode='single', plan='growth', billing='annual', noticeOn=false, bankOn=false;
+var proposalType = 'new', slabChoice = 'auto', noticeOn = false, bankOn = false, lastActiveSlabId = '';
+
+var SLABS = [
+  { id: 'basic', name: 'Basic', maxUsers: 5, price: 6999, profile: 'Small CA firms / Solo practitioners with small staff' },
+  { id: 'starter', name: 'Starter', maxUsers: 10, price: 9999, profile: 'Small to growing CA practices' },
+  { id: 'growth', name: 'Growth', maxUsers: 20, price: 16999, profile: 'Mid-sized, rapidly scaling CA firms' },
+  { id: 'professional', name: 'Professional', maxUsers: 40, price: 24999, profile: 'Large CA practices with multiple branches' },
+  { id: 'enterprise', name: 'Enterprise', maxUsers: 60, price: 34999, profile: 'Enterprise-grade CA firms & audit networks' }
+];
+
 function g(id){return document.getElementById(id)}
 function inr(v){return '₹'+Math.round(v).toLocaleString('en-IN')}
 
-function setMode(m){
-  mode=m;
-  document.body.className='mode-'+m;
-  g('pill-single').classList.toggle('active',m==='single');
-  g('pill-compare').classList.toggle('active',m==='compare');
-  g('mode-single').style.display=m==='single'?'':'none';
-  g('mode-compare').style.display=m==='compare'?'':'none';
-  g('ctrl-plan-wrap').style.display=m==='single'?'':'none';
-  update();
-}
-
-function setPlan(p){
-  plan=p;
-  g('pill-starter').classList.toggle('active',p==='starter');
-  g('pill-growth').classList.toggle('active',p==='growth');
-  g('pill-notice').classList.toggle('active',p==='notice');
+function onProposalTypeChange() {
+  var type = g('proposal-type').value;
+  proposalType = type;
   
-  if (p === 'notice') {
-    g('card-starter').style.display = 'none';
-    g('card-growth').style.display = 'none';
-    g('card-notice-proposal').style.display = '';
-    g('notice-card').style.display = 'none';
-    g('single-lbl').textContent = 'Notice Management Plan';
-    
-    // Hide controls that are irrelevant for Notice Only
+  var lblUsers = g('lbl-users');
+  if (lblUsers) {
+    if (type === 'new') {
+      lblUsers.textContent = 'Active Users';
+    } else if (type === 'migration') {
+      lblUsers.textContent = 'Current Legacy Seats';
+    }
+  }
+
+  if (type === 'notice') {
     g('ctrl-users-wrap').style.display = 'none';
-    g('ctrl-free-wrap').style.display = 'none';
-    g('ctrl-term1-wrap').style.display = 'none';
-    g('ctrl-term2-wrap').style.display = 'none';
-    g('ctrl-starter-price-wrap').style.display = 'none';
-    g('ctrl-growth-price-wrap').style.display = 'none';
-    g('ctrl-mode-wrap').style.display = 'none';
+    g('ctrl-slab-choice-wrap').style.display = 'none';
+    g('ctrl-slab-price-wrap').style.display = 'none';
+    g('ctrl-discount-wrap').style.display = 'none';
+    g('ctrl-free-months-wrap').style.display = 'none';
+    g('ctrl-legacy-plan-wrap').style.display = 'none';
     g('ctrl-notice-wrap').style.display = 'none';
+    
     g('ctrl-notice-price-wrap').style.display = '';
     g('ctrl-notice-credits-wrap').style.display = '';
     g('ctrl-notice-rate-wrap').style.display = '';
-    
-    // Force mode to single since comparison doesn't apply
-    mode = 'single';
-    g('mode-single').style.display = '';
-    g('mode-compare').style.display = 'none';
-    g('ctrl-plan-wrap').style.display = '';
   } else {
-    g('card-starter').style.display=p==='starter'?'':'none';
-    g('card-growth').style.display=p==='growth'?'':'none';
-    g('card-notice-proposal').style.display = 'none';
-    g('notice-card').style.display=noticeOn?'':'none';
-    g('single-lbl').textContent=(p==='starter'?'Starter':'Growth')+' Plan';
-    
-    // Show regular controls
     g('ctrl-users-wrap').style.display = '';
-    g('ctrl-free-wrap').style.display = '';
-    g('ctrl-term1-wrap').style.display = '';
-    g('ctrl-term2-wrap').style.display = '';
-    g('ctrl-starter-price-wrap').style.display = '';
-    g('ctrl-growth-price-wrap').style.display = '';
-    g('ctrl-mode-wrap').style.display = '';
+    g('ctrl-slab-choice-wrap').style.display = '';
+    g('ctrl-slab-price-wrap').style.display = '';
     g('ctrl-notice-wrap').style.display = '';
+    
+    g('ctrl-legacy-plan-wrap').style.display = (type === 'migration') ? '' : 'none';
+    
     g('ctrl-notice-price-wrap').style.display = noticeOn ? '' : 'none';
     g('ctrl-notice-credits-wrap').style.display = noticeOn ? '' : 'none';
     g('ctrl-notice-rate-wrap').style.display = noticeOn ? '' : 'none';
-    
-    // Restore mode
-    setMode(mode);
   }
-  update();
 }
 
-function setBilling(b){
-  billing=b;
-  // Growth
-  var gMo=g('bc-g-mo'), gAnn=g('bc-g-ann');
-  if(gMo&&gAnn){
-    gMo.classList.toggle('sel',b==='monthly'); gMo.classList.toggle('bc-dim',b!=='monthly');
-    gAnn.classList.toggle('sel',b==='annual');  gAnn.classList.toggle('bc-dim',b!=='annual');
-    g('bst-g-mo').style.display=b==='monthly'?'':'none';
-    g('bst-g-ann').style.display=b==='annual'?'':'none';
-  }
-  // Starter
-  var sMo=g('bc-s-mo'), sAnn=g('bc-s-ann');
-  if(sMo&&sAnn){
-    sMo.classList.toggle('sel',b==='monthly'); sMo.classList.toggle('bc-dim',b!=='monthly');
-    sAnn.classList.toggle('sel',b==='annual');  sAnn.classList.toggle('bc-dim',b!=='annual');
-    g('bst-s-mo').style.display=b==='monthly'?'':'none';
-    g('bst-s-ann').style.display=b==='annual'?'':'none';
-  }
-  update();
+function getSelectedSlabIndex(users) {
+  if (users <= 5) return 0;
+  if (users <= 10) return 1;
+  if (users <= 20) return 2;
+  if (users <= 40) return 3;
+  return 4; // Enterprise
+}
+
+function onSlabChoiceChange() {
+  slabChoice = g('slab-choice').value;
+  resetPriceAndDiscountForSlab();
+}
+
+function resetPriceAndDiscountForSlab() {
+  g('slab-discount').value = "0";
+  g('slab-free-months').value = "0";
+  g('slab-price-input').value = "";
+  lastActiveSlabId = "";
+}
+
+function updatePriceFromDiscount() {
+  lastActiveSlabId = "";
 }
 
 function toggleNotice(){
   noticeOn=!noticeOn;
   g('ntog').classList.toggle('on',noticeOn);
   g('notice-card').style.display=noticeOn?'':'none';
-  g('cmp-notice-row').style.display=(mode==='compare'&&noticeOn)?'':'none';
   
-  if (plan !== 'notice') {
+  if (proposalType !== 'notice') {
     g('ctrl-notice-price-wrap').style.display = noticeOn ? '' : 'none';
     g('ctrl-notice-credits-wrap').style.display = noticeOn ? '' : 'none';
     g('ctrl-notice-rate-wrap').style.display = noticeOn ? '' : 'none';
@@ -4103,41 +4038,10 @@ function toggleBank(){
   update();
 }
 
-function getTermLabel(months) {
-  if (months === 1) return 'Monthly';
-  if (months === 12) return 'Annual';
-  if (months === 18) return '1.5 Years';
-  if (months === 24) return '2 Years';
-  return months + ' Months';
-}
-
-function syncNoticePriceFromCreditsRate() {
-  var creds = parseFloat(g('notice-credits-input').value) || 0;
-  var rate = parseFloat(g('notice-rate-input').value) || 0;
-  g('notice-price-input').value = Math.round(creds * rate);
-}
-
-function syncNoticeRateFromCreditsPrice() {
-  var creds = parseFloat(g('notice-credits-input').value) || 0;
-  var price = parseFloat(g('notice-price-input').value) || 0;
-  if (creds > 0) {
-    g('notice-rate-input').value = (price / creds).toFixed(2);
-  }
-}
-
 function update(){
-  var freeMonths=parseInt(g('free-months').value);
-  if(isNaN(freeMonths)) freeMonths=2;
-  freeMonths=Math.max(0,Math.min(12,freeMonths));
-
   var users=parseInt(g('users').value);
   if(isNaN(users)) users=7;
   users=Math.max(1,users);
-  
-  var term1=Math.max(1,parseInt(g('term1-months').value)||1);
-  var term2=Math.max(1,parseInt(g('term2-months').value)||12);
-  var S=Math.max(0,parseInt(g('starter-price').value)||0);
-  var G=Math.max(0,parseInt(g('growth-price').value)||0);
 
   var noticeBase=5000;
   var nInput=g('notice-price-input');
@@ -4162,31 +4066,6 @@ function update(){
   var nGST=noticeBase*.18;
   var nFin=noticeBase*1.18;
 
-  var isNoticePlan = (plan === 'notice');
-  if (isNoticePlan) {
-    g('to-users-lbl').textContent = 'Notice Credits';
-    g('d-users').textContent = noticeCredits.toLocaleString('en-IN');
-    g('to-trial-lbl').textContent = 'Total Payable';
-    g('to-trial-val').textContent = inr(nFin);
-    g('to-trial-sub').textContent = 'GST inclusive';
-    g('to-trial-wrap').style.display = '';
-    if(g('trial-banner')) g('trial-banner').style.display = 'none';
-  } else {
-    g('to-users-lbl').textContent = 'Users';
-    g('d-users').textContent = users+' user'+(users!==1?'s':'');
-    g('to-trial-lbl').textContent = 'Free Trial';
-    g('to-trial-val').textContent = '7 days';
-    g('to-trial-sub').textContent = 'No credit card needed';
-    g('to-trial-wrap').style.display = '';
-    if(g('trial-banner')) g('trial-banner').style.display = '';
-  }
-
-  // Set card base prices dynamically
-  g('s-mo-price').textContent=100;
-  g('s-ann-cross').textContent=inr(100);
-  g('g-mo-price').textContent=200;
-  g('g-ann-cross').textContent=inr(200);
-
   // Set notice-card base prices dynamically
   if(g('n-price-val')) g('n-price-val').textContent=inr(noticeBase);
   if(g('n-credits-val')) g('n-credits-val').textContent=noticeCredits.toLocaleString('en-IN')+' sync credits included';
@@ -4201,245 +4080,274 @@ function update(){
   if(g('n-prop-gst')) g('n-prop-gst').textContent=inr(nGST);
   if(g('n-prop-fin')) g('n-prop-fin').textContent=inr(nFin);
 
-  var term1Lbl = getTermLabel(term1);
-  var term2Lbl = getTermLabel(term2);
-
-  // Set header labels on cards
-  g('s-term1-lbl').textContent = term1Lbl;
-  g('s-term2-lbl').textContent = term2Lbl;
-  g('g-term1-lbl').textContent = term1Lbl;
-  g('g-term2-lbl').textContent = term2Lbl;
-
-  // Set comparison labels
-  g('c-term1-lbl').textContent = term1Lbl;
-  g('c-term2-lbl').innerHTML = term2Lbl + ' <span style="background:var(--green-bg);color:var(--green-dark);font-size:9px;padding:1px 5px;border-radius:10px;font-weight:700">Best value</span>';
-
-  // Set row total labels on Monthly cards
-  g('s-mo-tot-lbl').textContent = term1Lbl + ' total';
-  g('g-mo-tot-lbl').textContent = term1Lbl + ' total';
-
-  // Set row pay & total labels on Annual cards
-  g('s-ann-pay-lbl').textContent = 'Pay (' + term2 + ' months)';
-  g('g-ann-pay-lbl').textContent = 'Pay (' + term2 + ' months)';
-  g('s-ann-tot-lbl').textContent = term2Lbl + ' total';
-  g('g-ann-tot-lbl').textContent = term2Lbl + ' total';
-
-  // Set savings summary pay val
-  g('g-ss-pay-val').textContent = term2 + ' month' + (term2 !== 1 ? 's' : '');
-  g('s-ss-pay-val').textContent = term2 + ' month' + (term2 !== 1 ? 's' : '');
-
-  var sMo=100*users*term1, gMo=200*users*term1;
-  var sAnn=S*users*term2, gAnn=G*users*term2;
-  var sSave=S*users*freeMonths, gSave=G*users*freeMonths;
-  var sEff=Math.round(S*term2/(term2+freeMonths)), gEff=Math.round(G*term2/(term2+freeMonths));
-
-  // ── Starter single ──
-  g('s-mo-u').textContent=users; g('s-mo-tot').textContent=inr(sMo);
-  g('s-mo-gst').textContent=inr(sMo*.18); g('s-mo-fin').textContent=inr(sMo*1.18);
-  g('s-ann-u').textContent=users; g('s-eff').textContent=sEff;
-  g('s-ann-pay').textContent=inr(sAnn); g('s-ann-tot').textContent=inr(sAnn);
-  g('s-ann-gst').textContent=inr(sAnn*.18); g('s-ann-fin').textContent=inr(sAnn*1.18);
-  g('s-ann-save').style.display=freeMonths>0?'':'none';
-  g('s-ann-save').textContent='✓ Save '+inr(sSave)+' — '+freeMonths+' months free — '+Math.round(freeMonths/term2*100)+'% more value';
-
-  // ── Growth single ──
-  g('g-mo-u').textContent=users; g('g-mo-tot').textContent=inr(gMo);
-  g('g-mo-gst').textContent=inr(gMo*.18); g('g-mo-fin').textContent=inr(gMo*1.18);
-  g('g-ann-u').textContent=users; g('g-eff').textContent=gEff;
-  if(g('g-ann-get'))g('g-ann-get').textContent=(term2+freeMonths)+' months';
-  if(g('s-ann-get'))g('s-ann-get').textContent=(term2+freeMonths)+' months';
-  // savings summary
-  if(g('g-savings')) g('g-savings').style.display=freeMonths>0?'':'none';
-  if(g('s-savings')) g('s-savings').style.display=freeMonths>0?'':'none';
-  if(g('g-ss-get')){
-    g('g-ss-get').textContent=(term2+freeMonths)+' months';
-    g('g-ss-rate').textContent='₹'+gEff+'/user/mo';
-    g('g-ss-saved').textContent=inr(gSave);
-    if(g('g-ss-pct')){var pct=Math.round(freeMonths/term2*100);g('g-ss-pct').textContent=pct+'% more value';g('g-ss-pct').setAttribute('data-tip',freeMonths+' free month'+(freeMonths>1?'s':'')+' ÷ '+term2+' paid months = '+pct+'%. You get '+pct+'% more access than what you actually paid for.');}
-  }
-  if(g('s-ss-get')){
-    g('s-ss-get').textContent=(term2+freeMonths)+' months';
-    g('s-ss-rate').textContent='₹'+sEff+'/user/mo';
-    g('s-ss-saved').textContent=inr(sSave);
-    if(g('s-ss-pct')){var pct2=Math.round(freeMonths/term2*100);g('s-ss-pct').textContent=pct2+'% more value';g('s-ss-pct').setAttribute('data-tip',freeMonths+' free month'+(freeMonths>1?'s':'')+' ÷ '+term2+' paid months = '+pct2+'%. You get '+pct2+'% more access than what you actually paid for.');}
-  }
-  g('g-ann-pay').textContent=inr(gAnn); g('g-ann-tot').textContent=inr(gAnn);
-  g('g-ann-gst').textContent=inr(gAnn*.18); g('g-ann-fin').textContent=inr(gAnn*1.18);
-  g('g-ann-save').style.display=freeMonths>0?'':'none';
-  g('g-ann-save').textContent='✓ Save '+inr(gSave)+' — '+freeMonths+' months free — '+Math.round(freeMonths/term2*100)+'% more value';
-
-  // ── Compare ──
-  g('c-s-mo-base').textContent='Base: '+inr(sMo)+'/mo';
-  g('c-s-mo-gst').textContent='+ GST: '+inr(sMo*.18);
-  g('c-s-mo-tot').textContent='Total: '+inr(sMo*1.18)+'/mo';
-  g('c-s-ann-pay').textContent='Pay: '+inr(sAnn)+' ('+term2+'mo)';
-  g('c-s-ann-gst').textContent='+ GST: '+inr(sAnn*.18);
-  g('c-s-ann-tot').textContent='Total: '+inr(sAnn*1.18)+'/yr';
-  g('c-s-ann-save').style.display=freeMonths>0?'':'none';
-  g('c-s-ann-save').textContent='Save '+inr(sSave);
-  g('c-g-mo-base').textContent='Base: '+inr(gMo)+'/mo';
-  g('c-g-mo-gst').textContent='+ GST: '+inr(gMo*.18);
-  g('c-g-mo-tot').textContent='Total: '+inr(gMo*1.18)+'/mo';
-  g('c-g-ann-pay').textContent='Pay: '+inr(gAnn)+' ('+term2+'mo)';
-  g('c-g-ann-gst').textContent='+ GST: '+inr(gAnn*.18);
-  g('c-g-ann-tot').textContent='Total: '+inr(gAnn*1.18)+'/yr';
-  g('c-g-ann-save').style.display=freeMonths>0?'':'none';
-  g('c-g-ann-save').textContent='Save '+inr(gSave);
+  // 1. Determine the Active Slab and Capacity
+  var slabIdx = 0;
+  var isCustomEnterprise = (users > 60 && slabChoice === 'auto') || (slabChoice === 'enterprise_custom');
   
-  // Set comparison base rate cell contents dynamically
-  g('c-s-mo-price').innerHTML = inr(100) + '<span style="font-size:11px;font-weight:500;color:var(--text3)">/user</span>';
-  g('c-g-mo-price').innerHTML = inr(200) + '<span style="font-size:11px;font-weight:500;color:var(--text3)">/user</span>';
-  g('c-s-ann-price').innerHTML = inr(sEff) + '<span style="font-size:11px;font-weight:500;color:var(--text3)">/user eff.</span>';
-  g('c-g-ann-price').innerHTML = inr(gEff) + '<span style="font-size:11px;font-weight:500;color:var(--text3)">/user eff.</span>';
-
-  var isNoticePlan = (plan === 'notice');
-  var nAmt = (isNoticePlan || noticeOn) ? nFin : 0;
-  g('cmp-s-grand').textContent=inr(sAnn*1.18+nAmt);
-  g('cmp-g-grand').textContent=inr(gAnn*1.18+nAmt);
-  g('cmp-grand-lbl').textContent=noticeOn?'+ Notice add-on':'';
-  g('cmp-notice-row').style.display=(mode==='compare'&&noticeOn)?'':'none';
-
-  // ── Summary strip ──
-  var selBase = 0;
-  if (plan === 'starter') {
-    selBase = billing === 'annual' ? sAnn : sMo;
-  } else if (plan === 'growth') {
-    selBase = billing === 'annual' ? gAnn : gMo;
+  if (isCustomEnterprise) {
+    slabIdx = 4; // Enterprise base price is the basis
+  } else {
+    if (slabChoice === 'auto') {
+      slabIdx = getSelectedSlabIndex(users);
+    } else {
+      slabIdx = SLABS.findIndex(function(s) { return s.id === slabChoice; });
+    }
   }
-  var selTotal = selBase*1.18;
-  var grand = selTotal + nAmt;
-  var modeLabel = mode==='compare'?'Compare':(plan==='starter'?'Starter':(plan==='notice'?'Notice Only':'Growth'));
+  
+  var activeSlab = SLABS[slabIdx];
+  var slabName = isCustomEnterprise ? 'Enterprise Custom' : activeSlab.name;
+  var slabCapacity = isCustomEnterprise ? users : activeSlab.maxUsers;
+  var slabStdPrice = activeSlab.price;
 
-  if (isNoticePlan) {
+  // 2. Manage Discount Visibility and State
+  // Basic and Starter slabs (indices 0 and 1) are not eligible for discounts
+  var isEligibleForDiscount = (slabIdx >= 2 || isCustomEnterprise);
+  if (!isEligibleForDiscount) {
+    g('ctrl-discount-wrap').style.display = 'none';
+    g('ctrl-free-months-wrap').style.display = 'none';
+    g('slab-discount').value = "0";
+    g('slab-free-months').value = "0";
+  } else {
+    g('ctrl-discount-wrap').style.display = '';
+    g('ctrl-free-months-wrap').style.display = '';
+  }
+
+  var discountPercent = parseInt(g('slab-discount').value) || 0;
+  var freeMonths = parseInt(g('slab-free-months').value) || 0;
+  var accessTerm = 12 + freeMonths;
+
+  // Apply default slab price on change if the price input is empty or has standard/discounted price matching the previous state
+  var basePrice = parseFloat(g('slab-price-input').value);
+  if (isNaN(basePrice)) {
+    basePrice = Math.round(slabStdPrice * (1 - discountPercent / 100));
+    g('slab-price-input').value = basePrice;
+  }
+
+  var coreTotal = basePrice * 1.18;
+  var nAmt = (proposalType === 'notice' || noticeOn) ? nFin : 0;
+  var grand = (proposalType === 'notice') ? nFin : (coreTotal + (noticeOn ? nFin : 0));
+
+  // 3. Render Page 1 Card Layouts
+  if (proposalType === 'notice') {
+    g('card-new-slab').style.display = 'none';
+    g('card-migration').style.display = 'none';
+    g('card-notice-proposal').style.display = '';
+    g('notice-card').style.display = 'none';
+    g('single-lbl').textContent = 'Notice Management Plan';
+  } else {
+    g('card-notice-proposal').style.display = 'none';
+    g('notice-card').style.display = noticeOn ? '' : 'none';
+    
+    if (proposalType === 'new') {
+      g('card-new-slab').style.display = '';
+      g('card-migration').style.display = 'none';
+      g('single-lbl').textContent = 'Turia Practice Annual License';
+
+      // Update Slab Card details
+      g('new-slab-badge').textContent = slabName + ' Slab';
+      g('new-slab-name').textContent = slabName + ' Slab (Up to ' + slabCapacity + ' Users)';
+      g('new-slab-price').textContent = basePrice.toLocaleString('en-IN');
+      g('new-slab-cap').textContent = 'Up to ' + slabCapacity + ' Users';
+      g('new-slab-active-u').textContent = users + ' Users';
+      
+      var buffer = slabCapacity - users;
+      g('new-slab-buffer').textContent = buffer >= 0 ? (buffer + ' seat' + (buffer !== 1 ? 's' : '') + ' free') : '0 seats free (limit exceeded)';
+      g('new-slab-buffer').style.color = buffer > 0 ? 'var(--green-mid)' : 'var(--text3)';
+      
+      if (freeMonths > 0) {
+        g('new-slab-term').textContent = accessTerm + ' months (' + freeMonths + ' mo free)';
+        g('new-slab-term-desc').textContent = 'effective for ' + accessTerm + ' months (GST exclusive)';
+      } else {
+        g('new-slab-term').textContent = '1 Year (365 Days)';
+        g('new-slab-term-desc').textContent = 'per year (GST exclusive)';
+      }
+
+      g('new-slab-sub').textContent = inr(basePrice);
+      g('new-slab-gst').textContent = inr(basePrice * 0.18);
+      g('new-slab-fin').textContent = inr(coreTotal);
+
+      // New Customer Savings Logic: compare to equivalent legacy Growth @ ₹200/mo
+      var legacyAnnual = users * 200 * 12;
+      var savings = legacyAnnual - basePrice;
+      var savingsPct = Math.round(savings / legacyAnnual * 100);
+      
+      if (savings > 0) {
+        g('new-slab-savings-box').style.display = '';
+        g('new-slab-savings-val').textContent = 'Save ' + inr(savings) + ' / yr (' + savingsPct + '% savings)';
+      } else {
+        g('new-slab-savings-box').style.display = 'none';
+      }
+
+    } else if (proposalType === 'migration') {
+      g('card-new-slab').style.display = 'none';
+      g('card-migration').style.display = '';
+      g('single-lbl').textContent = 'Legacy Monthly to Annual Migration Proposal';
+
+      // Update Migration Card details
+      var legacyPlan = g('legacy-plan').value;
+      var legacyRate = legacyPlan === 'growth' ? 200 : 100;
+      var legacyMonthly = users * legacyRate;
+      var legacyAnnualVal = legacyMonthly * 12;
+
+      g('mig-curr-run').textContent = users + ' Seat' + (users !== 1 ? 's' : '') + ' @ ' + inr(legacyRate) + '/mo = ' + inr(legacyMonthly) + '/month';
+      g('mig-curr-annual').textContent = 'Annualized Legacy Spend: ' + inr(legacyAnnualVal) + ' / year';
+
+      g('mig-slab-label').textContent = slabName + ' Slab (Up to ' + slabCapacity + ' Users)';
+      g('mig-price').textContent = basePrice.toLocaleString('en-IN');
+      g('mig-slab-name').textContent = slabName + ' Slab';
+      g('mig-slab-cap-r').textContent = 'Up to ' + slabCapacity + ' Users';
+
+      if (freeMonths > 0) {
+        g('mig-term').textContent = accessTerm + ' months (' + freeMonths + ' mo free)';
+        g('mig-term-desc').textContent = 'effective for ' + accessTerm + ' months (GST exclusive)';
+      } else {
+        g('mig-term').textContent = '1 Year (365 Days)';
+        g('mig-term-desc').textContent = 'per year (GST exclusive)';
+      }
+
+      g('mig-sub').textContent = inr(basePrice);
+      g('mig-gst').textContent = inr(basePrice * 0.18);
+      g('mig-fin').textContent = inr(coreTotal);
+
+      // Benefit list computations
+      var migSavings = legacyAnnualVal - basePrice;
+      var migSavingsPct = Math.round(migSavings / legacyAnnualVal * 100);
+      g('mig-benefit-save').textContent = 'Save ' + inr(migSavings) + ' / year (' + migSavingsPct + '% direct cost reduction)';
+
+      var migBuffer = slabCapacity - users;
+      g('mig-benefit-cap').textContent = '+' + migBuffer + ' additional buffer seat' + (migBuffer !== 1 ? 's' : '') + ' (upgraded from ' + users + ' to ' + slabCapacity + ' user limit)';
+      
+      if (legacyPlan === 'basic') {
+        g('mig-benefit-feat').textContent = '100% access to all 23 modules, upgraded from restricted Basic plan';
+      } else {
+        g('mig-benefit-feat').textContent = '100% access to all 23 modules, feature parity maintained';
+      }
+
+      if (migSavings > 0) {
+        g('mig-savings-box').style.display = '';
+        g('mig-savings-val').textContent = 'Save ' + inr(migSavings) + ' / yr (' + migSavingsPct + '% savings)';
+      } else {
+        g('mig-savings-box').style.display = 'none';
+      }
+    }
+  }
+
+  // 4. Update Purple Client Top Bar
+  if (proposalType === 'notice') {
+    g('to-users-lbl').textContent = 'Notice Credits';
+    g('d-users').textContent = noticeCredits.toLocaleString('en-IN');
+    g('to-trial-lbl').textContent = 'Total Payable';
+    g('to-trial-val').textContent = inr(nFin);
+    g('to-trial-sub').textContent = 'GST inclusive';
+    g('to-trial-wrap').style.display = '';
+    if(g('trial-banner')) g('trial-banner').style.display = 'none';
+  } else {
+    g('to-users-lbl').textContent = 'Active Users';
+    g('d-users').textContent = users + ' user' + (users !== 1 ? 's' : '');
+    g('to-trial-lbl').textContent = 'Total Payable';
+    g('to-trial-val').textContent = inr(grand);
+    g('to-trial-sub').textContent = 'GST inclusive';
+    g('to-trial-wrap').style.display = '';
+    if(g('trial-banner')) g('trial-banner').style.display = 'none';
+  }
+
+  // 5. Update Bottom Summary Strip
+  if (proposalType === 'notice') {
     g('sum-cfg').textContent = 'Notice Management Plan';
     g('sum-plan').style.display = 'none';
     g('sum-nsep').style.display = 'none';
     g('sum-notice').style.display = '';
   } else {
-    g('sum-cfg').textContent=modeLabel+' · '+getTermLabel(billing==='annual'?term2:term1)+' · '+users+' user'+(users!==1?'s':'');
+    var descBilling = freeMonths > 0 ? (accessTerm + ' Months') : 'Annual';
+    g('sum-cfg').textContent = slabName + ' Slab · ' + descBilling + ' · ' + users + ' user' + (users !== 1 ? 's' : '');
     g('sum-plan').style.display = '';
-    g('sum-plan').textContent='Plan: '+inr(selTotal);
-    g('sum-nsep').style.display=noticeOn?'':'none';
-    g('sum-notice').style.display=noticeOn?'':'none';
+    g('sum-plan').textContent = 'Plan: ' + inr(coreTotal);
+    g('sum-nsep').style.display = noticeOn ? '' : 'none';
+    g('sum-notice').style.display = noticeOn ? '' : 'none';
   }
-  g('sum-notice').textContent='Notice: '+inr(nFin);
-  g('sum-total').textContent=inr(grand);
+  g('sum-notice').textContent = 'Notice: ' + inr(nFin);
+  g('sum-total').textContent = inr(grand);
 
-  // ── Print page 2 ──
-  var selR=plan==='starter'?(billing==='annual'?S:100):(billing==='annual'?G:200);
-  var selB2=billing==='annual'?selR*users*term2:selR*users*term1;
-  var selG2=selB2*.18;
-  var sub2=selB2+(noticeOn?noticeBase:0);
-  var tGST=selG2+(noticeOn?noticeBase*0.18:0);
-  var gd2=sub2+tGST;
-  g('ps-date').textContent=today;
-  g('ps-contact').textContent=contact;
-  g('ps-users').textContent=users+' user'+(users!==1?'s':'');
+  // 6. Update Page 2 Invoice PDF Print Layout
+  g('ps-date').textContent = today;
+  g('ps-contact').textContent = contact;
 
-  if (isNoticePlan) {
-    g('ps-plan-billing').textContent='Notice Only';
-    g('ps-plan-row').style.display='none';
-    g('ps-nrow').style.display='';
-    if(g('ps-n-title')) g('ps-n-title').textContent='Notice Management Plan';
-    if(g('ps-n-sub')) g('ps-n-sub').textContent=noticeCredits.toLocaleString('en-IN')+' sync credits · GST, TDS & IT portal';
-    if(g('ps-n-qty')) g('ps-n-qty').textContent=noticeCredits.toLocaleString('en-IN');
-    if(g('ps-n-rate')) g('ps-n-rate').textContent='₹'+noticeRate.toFixed(2);
-    if(g('ps-n-amt')) g('ps-n-amt').textContent=inr(noticeBase);
-    g('ps-sub').textContent=inr(noticeBase);
-    g('ps-gst').textContent=inr(noticeBase*0.18);
-    g('ps-grand').textContent=inr(nFin);
-    g('ps-save').style.display='none';
-    g('ps-bank').style.display='';
+  if (proposalType === 'notice') {
+    g('ps-users').textContent = noticeCredits.toLocaleString('en-IN') + ' credits';
+    g('ps-plan-billing').textContent = 'Notice Only';
+    g('ps-plan-row').style.display = 'none';
+    g('ps-nrow').style.display = '';
     
-    // Update QR for Notice plan + notice
-    var cmpAmt=nFin.toFixed(2);
-    var cmpUrl='upi://pay?pa=8722750204%40pthdfc&pn=Turiabooks%20Technologies&am='+cmpAmt+'&cu=INR&tn=Turia%20Subscription';
-    if(typeof QRCode!=='undefined'){generateQR('ps-bk-qr',cmpUrl,82);}
-    var pa=document.getElementById('ps-bk-qr-amt');if(pa)pa.textContent=inr(nFin);
+    if(g('ps-n-title')) g('ps-n-title').textContent = 'Notice Management Plan';
+    if(g('ps-n-sub')) g('ps-n-sub').textContent = noticeCredits.toLocaleString('en-IN') + ' sync credits · GST, TDS & IT portal';
+    if(g('ps-n-qty')) g('ps-n-qty').textContent = noticeCredits.toLocaleString('en-IN');
+    if(g('ps-n-rate')) g('ps-n-rate').textContent = '₹' + noticeRate.toFixed(2);
+    if(g('ps-n-amt')) g('ps-n-amt').textContent = inr(noticeBase);
+    
+    g('ps-sub').textContent = inr(noticeBase);
+    g('ps-gst').textContent = inr(noticeBase * 0.18);
+    g('ps-grand').textContent = inr(nFin);
+    g('ps-save').style.display = 'none';
   } else {
-    g('ps-plan-row').style.display='';
-    if(g('ps-n-title')) g('ps-n-title').textContent='Notice Management Add-on';
-    if(g('ps-n-sub')) g('ps-n-sub').textContent=noticeCredits.toLocaleString('en-IN')+' sync credits · GST, TDS & IT portal';
-    if(g('ps-n-qty')) g('ps-n-qty').textContent=noticeCredits.toLocaleString('en-IN');
-    if(g('ps-n-rate')) g('ps-n-rate').textContent='₹'+noticeRate.toFixed(2);
-    if(g('ps-n-amt')) g('ps-n-amt').textContent=inr(noticeBase);
-
-    if(mode==='compare'){
-      // Compare mode: always show Growth Annual summary
-      var gu=users,gr=G,gann=gr*gu*term2;
-      var gsub=gann+(noticeOn?noticeBase:0);
-      var ggst=gann*0.18+(noticeOn?noticeBase*0.18:0);
-      var ggrand=gsub+ggst;
-      g('ps-plan-billing').textContent='Growth · '+getTermLabel(term2);
-      g('ps-pname').textContent='Growth Plan — '+getTermLabel(term2);
-      g('ps-psub').textContent='₹'+G+'/user/month × '+term2+' months · '+(term2+freeMonths)+' months access';
-      g('ps-pqty').textContent=gu;
-      g('ps-prate').textContent=inr(gr*term2);
-      g('ps-pamt').textContent=inr(gann);
-      g('ps-nrow').style.display=noticeOn?'':'none';
-      g('ps-sub').textContent=inr(gsub);
-      g('ps-gst').textContent=inr(ggst);
-      g('ps-grand').textContent=inr(ggrand);
-      g('ps-save').style.display=freeMonths>0?'':'none';
-      g('ps-save').textContent='✓ '+getTermLabel(term2)+' plan — '+freeMonths+' months free access included';
-      g('ps-bank').style.display='';
-      // Update QR for Growth annual + notice
-      var cmpAmt=ggrand.toFixed(2);
-      var cmpUrl='upi://pay?pa=8722750204%40pthdfc&pn=Turiabooks%20Technologies&am='+cmpAmt+'&cu=INR&tn=Turia%20Subscription';
-      if(typeof QRCode!=='undefined'){generateQR('ps-bk-qr',cmpUrl,82);}
-      var pa=document.getElementById('ps-bk-qr-amt');if(pa)pa.textContent=inr(ggrand);
+    g('ps-users').textContent = users + ' user' + (users !== 1 ? 's' : '');
+    g('ps-plan-billing').textContent = slabName + ' Slab · ' + (freeMonths > 0 ? (accessTerm + ' months') : 'Annual');
+    g('ps-plan-row').style.display = '';
+    
+    g('ps-pname').textContent = 'Turia Practice Annual License — ' + slabName + ' Slab';
+    g('ps-psub').textContent = 'Up to ' + slabCapacity + ' Team Members · All 23 modules · ' + (freeMonths > 0 ? (accessTerm + ' months access') : '1 Year access');
+    g('ps-pqty').textContent = '1';
+    g('ps-prate').textContent = inr(basePrice);
+    g('ps-pamt').textContent = inr(basePrice);
+    
+    if (noticeOn) {
+      g('ps-nrow').style.display = '';
+      if(g('ps-n-title')) g('ps-n-title').textContent = 'Notice Management Add-on';
+      if(g('ps-n-sub')) g('ps-n-sub').textContent = noticeCredits.toLocaleString('en-IN') + ' sync credits · GST, TDS & IT portal';
+      if(g('ps-n-qty')) g('ps-n-qty').textContent = noticeCredits.toLocaleString('en-IN');
+      if(g('ps-n-rate')) g('ps-n-rate').textContent = '₹' + noticeRate.toFixed(2);
+      if(g('ps-n-amt')) g('ps-n-amt').textContent = inr(noticeBase);
+      
+      g('ps-sub').textContent = inr(basePrice + noticeBase);
+      g('ps-gst').textContent = inr((basePrice + noticeBase) * 0.18);
+      g('ps-grand').textContent = inr(grand);
     } else {
-      g('ps-plan-billing').textContent=(plan==='starter'?'Starter':'Growth')+' · '+getTermLabel(billing==='annual'?term2:term1);
-      g('ps-pname').textContent=(plan==='starter'?'Starter':'Growth')+' Plan — '+getTermLabel(billing==='annual'?term2:term1);
-      g('ps-psub').textContent='₹'+selR+'/user/month × '+(billing==='annual'?term2:term1)+' months · '+(billing==='annual'?(term2+freeMonths):term1)+' months access';
-      g('ps-pqty').textContent=users;
-      g('ps-prate').textContent=inr(billing==='annual'?selR*term2:selR*term1);
-      g('ps-pamt').textContent=inr(selB2);
-      g('ps-nrow').style.display=noticeOn?'':'none';
-      g('ps-sub').textContent=inr(sub2);
-      g('ps-gst').textContent=inr(tGST);
-      g('ps-grand').textContent=inr(gd2);
-      g('ps-save').style.display=(billing==='annual' && freeMonths>0)?'':'none';
-      g('ps-save').textContent='✓ '+getTermLabel(term2)+' plan — '+freeMonths+' months free access included';
-      g('ps-bank').style.display=bankOn?'':'none';
+      g('ps-nrow').style.display = 'none';
+      g('ps-sub').textContent = inr(basePrice);
+      g('ps-gst').textContent = inr(basePrice * 0.18);
+      g('ps-grand').textContent = inr(grand);
+    }
+    
+    if (freeMonths > 0) {
+      g('ps-save').style.display = '';
+      g('ps-save').textContent = '✓ ' + freeMonths + ' months free access included';
+    } else {
+      g('ps-save').style.display = 'none';
     }
   }
 
-    // ── DYNAMIC UPI QR (amount = grand total incl. GST) ──
-    var qrGrand = parseFloat(g('sum-total').textContent.replace(/[₹,]/g,'')) || 0;
-    var upiAmt  = qrGrand.toFixed(2);
-    var upiUrl  = 'upi://pay?pa=8722750204%40pthdfc&pn=Turiabooks%20Technologies&am=' + upiAmt + '&cu=INR&tn=Turia%20Subscription';
-    if (typeof QRCode !== 'undefined') {
-      generateQR('bk-qr',    upiUrl, 100);
-      if (mode !== 'compare') {
-        generateQR('ps-bk-qr', upiUrl, 82);
-      }
-    }
-    var amtFmt = '₹' + Math.round(qrGrand).toLocaleString('en-IN');
-    var ba = document.getElementById('bk-qr-amt');    if(ba) ba.textContent = amtFmt;
-    if (mode !== 'compare') {
-      var pa = document.getElementById('ps-bk-qr-amt'); if(pa) pa.textContent = amtFmt;
-    }
-  g('ps-rep-name').textContent=rp[0];
-  g('ps-rep-phone').textContent=rp[1];
-  g('ps-rep-email').textContent=rp[2];
+  g('ps-bank').style.display = bankOn ? '' : 'none';
+
+  // 7. Update Dynamic UPI QR Code
+  var upiAmt = grand.toFixed(2);
+  var upiUrl = 'upi://pay?pa=8722750204%40pthdfc&pn=Turiabooks%20Technologies&am=' + upiAmt + '&cu=INR&tn=Turia%20Subscription';
+  if (typeof QRCode !== 'undefined') {
+    generateQR('bk-qr', upiUrl, 100);
+    generateQR('ps-bk-qr', upiUrl, 82);
+  }
+  var amtFmt = inr(grand);
+  var ba = document.getElementById('bk-qr-amt'); if(ba) ba.textContent = amtFmt;
+  var pa = document.getElementById('ps-bk-qr-amt'); if(pa) pa.textContent = amtFmt;
+
+  g('ps-rep-name').textContent = rp[0];
+  g('ps-rep-phone').textContent = rp[1];
+  g('ps-rep-email').textContent = rp[2];
 }
 
-
 function printQuote(){
-  var freeMonths=parseInt(g('free-months').value);
-  if(isNaN(freeMonths)) freeMonths=2;
-  freeMonths=Math.max(0,Math.min(12,freeMonths));
-
   var users=parseInt(g('users').value);
   if(isNaN(users)) users=7;
   users=Math.max(1,users);
   
-  var term1=Math.max(1,parseInt(g('term1-months').value)||1);
-  var term2=Math.max(1,parseInt(g('term2-months').value)||12);
-  var S=Math.max(0,parseInt(g('starter-price').value)||0);
-  var G=Math.max(0,parseInt(g('growth-price').value)||0);
-
   var noticeBase=5000;
   var nInput=g('notice-price-input');
   if(nInput) noticeBase=Math.max(0,parseInt(nInput.value)||0);
@@ -4452,40 +4360,61 @@ function printQuote(){
   var nRateInput=g('notice-rate-input');
   if(nRateInput) noticeRate=Math.max(0,parseFloat(nRateInput.value)||0);
 
-  var isNoticePlan = (plan === 'notice');
-
-  var S_std = isNoticePlan ? 0 : (plan === 'starter' ? 100 : 200);
-  var term = isNoticePlan ? 0 : (billing === 'annual' ? term2 : term1);
-  var std_free = isNoticePlan ? 0 : (billing === 'annual' ? 2 : 0);
+  var isNoticePlan = (proposalType === 'notice');
   
-  var S_cust = isNoticePlan ? 0 : (plan === 'starter' ? (billing === 'annual' ? S : 100) : (billing === 'annual' ? G : 200));
+  // 1. Calculate Slab Tiers (Standard vs Customized)
+  var slabIdx = 0;
+  var isCustomEnterprise = (users > 60 && slabChoice === 'auto') || (slabChoice === 'enterprise_custom');
+  if (isCustomEnterprise) {
+    slabIdx = 4;
+  } else {
+    if (slabChoice === 'auto') {
+      slabIdx = getSelectedSlabIndex(users);
+    } else {
+      slabIdx = SLABS.findIndex(function(s) { return s.id === slabChoice; });
+    }
+  }
+  var activeSlab = SLABS[slabIdx];
+  var slabName = isCustomEnterprise ? 'Enterprise Custom' : activeSlab.name;
+  var slabCapacity = isCustomEnterprise ? users : activeSlab.maxUsers;
+  var slabStdPrice = activeSlab.price;
+  
+  var discountPercent = parseInt(g('slab-discount').value) || 0;
+  var freeMonths = parseInt(g('slab-free-months').value) || 0;
+  var accessTerm = 12 + freeMonths;
+  
+  var basePrice = parseFloat(g('slab-price-input').value);
+  if (isNaN(basePrice)) {
+    basePrice = Math.round(slabStdPrice * (1 - discountPercent / 100));
+  }
 
   var stdNotice = (isNoticePlan || noticeOn) ? (noticeCredits * 0.5) : 0;
   var custNotice = (isNoticePlan || noticeOn) ? noticeBase : 0;
-  
-  var price_loss = isNoticePlan ? 0 : (S_std - S_cust) * users * term;
-  var free_loss = isNoticePlan ? 0 : S_std * users * (freeMonths - std_free);
+
+  // Deviation computations
+  var price_loss = isNoticePlan ? 0 : (slabStdPrice - basePrice);
+  var free_loss = isNoticePlan ? 0 : Math.round(slabStdPrice * (freeMonths / 12));
   var notice_loss = stdNotice - custNotice;
   
   var net_loss = price_loss + free_loss + notice_loss;
 
-  // Standard Values
-  var stdBase = S_std;
-  var stdPaid = term;
-  var stdFree = std_free;
-  var stdAccess = stdPaid + stdFree;
-  var stdEff = isNoticePlan ? 0 : Math.round(stdBase * stdPaid / stdAccess);
-  var stdSub = (isNoticePlan ? 0 : stdBase * users * stdPaid) + stdNotice;
+  // Standard (Recommended Guidelines)
+  var stdBase = isNoticePlan ? 0 : slabStdPrice;
+  var stdPaid = isNoticePlan ? 0 : 12;
+  var stdFree = 0;
+  var stdAccess = isNoticePlan ? 0 : 12;
+  var stdEff = isNoticePlan ? 0 : Math.round(stdBase / 12);
+  var stdSub = (isNoticePlan ? 0 : stdBase) + stdNotice;
   var stdGst = stdSub * 0.18;
   var stdGrand = stdSub * 1.18;
 
-  // Custom Values
-  var custBase = S_cust;
-  var custPaid = term;
+  // Custom (As quoted)
+  var custBase = isNoticePlan ? 0 : basePrice;
+  var custPaid = isNoticePlan ? 0 : 12;
   var custFree = isNoticePlan ? 0 : freeMonths;
-  var custAccess = custPaid + custFree;
-  var custEff = isNoticePlan ? 0 : Math.round(custBase * custPaid / custAccess);
-  var custSub = (isNoticePlan ? 0 : custBase * users * custPaid) + custNotice;
+  var custAccess = isNoticePlan ? 0 : accessTerm;
+  var custEff = isNoticePlan ? 0 : Math.round(custBase / (accessTerm || 12));
+  var custSub = (isNoticePlan ? 0 : custBase) + custNotice;
   var custGst = custSub * 0.18;
   var custGrand = custSub * 1.18;
 
@@ -4498,8 +4427,8 @@ function printQuote(){
   g('m-row-eff').style.display = showCore ? '' : 'none';
   g('m-row-divider').style.display = showCore ? '' : 'none';
 
-  // Update Base Rate label dynamically
-  g('m-base-lbl').textContent = 'Base Rate (user/mo)';
+  // Base Rate Label
+  g('m-base-lbl').textContent = 'Base Rate (Slab/Year)';
 
   // Populate comparison table fields
   g('m-std-base').textContent = inr(stdBase);
@@ -4514,8 +4443,8 @@ function printQuote(){
   g('m-std-access').textContent = stdAccess + ' mo';
   g('m-cust-access').textContent = custAccess + ' mo';
   
-  g('m-std-eff').textContent = inr(stdEff) + '/user/mo';
-  g('m-cust-eff').textContent = inr(custEff) + '/user/mo';
+  g('m-std-eff').textContent = inr(stdEff) + '/mo';
+  g('m-cust-eff').textContent = inr(custEff) + '/mo';
 
   // Notice Add-on row
   var showNoticeRow = isNoticePlan || noticeOn;
@@ -4559,7 +4488,7 @@ function printQuote(){
   g('m-client-name').textContent = clientName;
   
   // Set modal header text
-  g('m-header').textContent = 'Quote Authorization — ' + (isNoticePlan ? 'Standalone Notice Plan' : (plan === 'starter' ? 'Starter Plan' : 'Growth Plan'));
+  g('m-header').textContent = 'Quote Authorization — ' + (isNoticePlan ? 'Standalone Notice Plan' : (slabName + ' Slab'));
 
   // Show modal
   g('confirm-modal').style.display = 'flex';
@@ -4580,8 +4509,8 @@ function confirmPrint() {
 
 document.addEventListener('DOMContentLoaded',function(){
   document.body.className = 'mode-single';
-  setPlan('growth');
-  setBilling('annual');
+  onProposalTypeChange();
+  resetPriceAndDiscountForSlab();
   update();
 });
 </script>
