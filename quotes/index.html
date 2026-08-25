@@ -3602,7 +3602,7 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
             
             <div class="bc-row"><span class="l">User Capacity</span><span class="r" id="new-slab-cap">Up to 20 Users</span></div>
             <div class="bc-row"><span class="l">Active Seats</span><span class="r" id="new-slab-active-u">7 Users</span></div>
-            <div class="bc-row"><span class="l">Future Expansion Room</span><span class="r" id="new-slab-buffer" style="font-weight:800;color:var(--purple-dark)">13 seats (add staff at ₹0 cost)</span></div>
+            <div class="bc-row"><span class="l">Expansion Room</span><span class="r" id="new-slab-buffer" style="font-weight:800;color:var(--purple-dark)">13 seats included</span></div>
             <div class="bc-row"><span class="l">Term Duration</span><span class="r" id="new-slab-term">1 Year (365 Days)</span></div>
             
             <div class="bc-div" style="margin:12px 0; border-top-style:dashed;"></div>
@@ -4176,7 +4176,7 @@ function update(){
       g('new-slab-active-u').textContent = users + ' Users';
       
       var buffer = slabCapacity - users;
-      g('new-slab-buffer').textContent = buffer > 0 ? (buffer + ' seat' + (buffer !== 1 ? 's' : '') + ' (add staff at ₹0 cost)') : 'None (at capacity limit)';
+      g('new-slab-buffer').textContent = buffer > 0 ? (buffer + ' seat' + (buffer !== 1 ? 's' : '') + ' included') : 'Fully utilized';
       g('new-slab-buffer').style.color = buffer > 0 ? 'var(--green-mid)' : 'var(--text3)';
       
       if (freeMonths > 0) {
