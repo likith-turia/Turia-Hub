@@ -3540,8 +3540,9 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
   <!-- TO BAR -->
   <div class="q-to">
     <div><div class="q-to-lbl">Prepared for</div><div class="q-to-val" id="d-contact">—</div></div>
-    <div id="to-users-wrap"><div class="q-to-lbl" id="to-users-lbl">Users</div><div class="q-to-val" id="d-users">7 users</div></div>
-    <div id="to-trial-wrap"><div class="q-to-lbl" id="to-trial-lbl">Free Trial</div><div class="q-to-val" id="to-trial-val">7 days</div><div class="q-to-sub" id="to-trial-sub">No credit card needed</div></div>
+    <div id="to-plan-wrap"><div class="q-to-lbl">Selected Plan</div><div class="q-to-val" id="d-plan">—</div></div>
+    <div id="to-users-wrap"><div class="q-to-lbl" id="to-users-lbl">Active Seats</div><div class="q-to-val" id="d-users">7 users</div></div>
+    <div id="to-trial-wrap"><div class="q-to-lbl" id="to-trial-lbl">Total Payable</div><div class="q-to-val" id="to-trial-val">—</div><div class="q-to-sub" id="to-trial-sub">GST exclusive</div></div>
   </div>
 
   <div class="q-body">
@@ -4261,19 +4262,21 @@ function update(){
 
   // 4. Update Purple Client Top Bar
   if (proposalType === 'notice') {
-    g('to-users-lbl').textContent = 'Notice Credits';
-    g('d-users').textContent = noticeCredits.toLocaleString('en-IN');
+    g('d-plan').textContent = 'Notice Management';
+    g('to-users-lbl').textContent = 'Credits';
+    g('d-users').textContent = noticeCredits.toLocaleString('en-IN') + ' syncs';
     g('to-trial-lbl').textContent = 'Total Payable';
-    g('to-trial-val').textContent = inr(nFin);
-    g('to-trial-sub').textContent = 'GST inclusive';
+    g('to-trial-val').textContent = inr(noticeBase);
+    g('to-trial-sub').textContent = 'GST exclusive';
     g('to-trial-wrap').style.display = '';
     if(g('trial-banner')) g('trial-banner').style.display = 'none';
   } else {
-    g('to-users-lbl').textContent = 'Active Users';
+    g('d-plan').textContent = slabName + ' Slab';
+    g('to-users-lbl').textContent = 'Active Seats';
     g('d-users').textContent = users + ' user' + (users !== 1 ? 's' : '');
     g('to-trial-lbl').textContent = 'Total Payable';
-    g('to-trial-val').textContent = inr(grand);
-    g('to-trial-sub').textContent = 'GST inclusive';
+    g('to-trial-val').textContent = inr(basePrice + (noticeOn ? noticeBase : 0));
+    g('to-trial-sub').textContent = 'GST exclusive';
     g('to-trial-wrap').style.display = '';
     if(g('trial-banner')) g('trial-banner').style.display = 'none';
   }
