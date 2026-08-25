@@ -3464,7 +3464,7 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
       <option value="enterprise_custom">Enterprise Custom</option>
     </select>
   </div>
-  <div class="field" id="ctrl-slab-price-wrap">
+  <div class="field" id="ctrl-slab-price-wrap" style="display:none">
     <label>Slab Price (₹)</label>
     <input type="number" id="slab-price-input" class="w-sm" min="0" oninput="update()" style="width:90px">
   </div>
@@ -3602,7 +3602,7 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
             
             <div class="bc-row"><span class="l">User Capacity</span><span class="r" id="new-slab-cap">Up to 20 Users</span></div>
             <div class="bc-row"><span class="l">Active Seats</span><span class="r" id="new-slab-active-u">7 Users</span></div>
-            <div class="bc-row"><span class="l">Buffer Seats Available</span><span class="r" id="new-slab-buffer" style="font-weight:800;color:var(--purple-dark)">13 seats free</span></div>
+            <div class="bc-row"><span class="l">Future Expansion Room</span><span class="r" id="new-slab-buffer" style="font-weight:800;color:var(--purple-dark)">13 seats (add staff at ₹0 cost)</span></div>
             <div class="bc-row"><span class="l">Term Duration</span><span class="r" id="new-slab-term">1 Year (365 Days)</span></div>
             
             <div class="bc-div" style="margin:12px 0; border-top-style:dashed;"></div>
@@ -3650,7 +3650,7 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
               </li>
               <li>
                 <span class="fc" style="background:var(--teal-bg); color:var(--teal-dark)">✓</span>
-                <span><strong style="color:var(--text); display:block;">Capacity Expansion</strong><span id="mig-benefit-cap">+2 free buffer seats (upgraded from 8 to 10 user limit)</span></span>
+                <span><strong style="color:var(--text); display:block;">Future Expansion Room</strong><span id="mig-benefit-cap">+2 additional seats included (add staff anytime at ₹0 cost)</span></span>
               </li>
               <li>
                 <span class="fc" style="background:var(--teal-bg); color:var(--teal-dark)">✓</span>
@@ -3983,7 +3983,7 @@ function onProposalTypeChange() {
   } else {
     g('ctrl-users-wrap').style.display = '';
     g('ctrl-slab-choice-wrap').style.display = '';
-    g('ctrl-slab-price-wrap').style.display = '';
+    g('ctrl-slab-price-wrap').style.display = 'none';
     g('ctrl-notice-wrap').style.display = '';
     
     g('ctrl-legacy-plan-wrap').style.display = (type === 'migration') ? '' : 'none';
@@ -4036,6 +4036,34 @@ function toggleBank(){
   g('btog').classList.toggle('on',bankOn);
   g('bank-card').style.display=bankOn?'':'none';
   update();
+}
+
+function updateDiscountOptions(slabIdx) {
+  var select = g('slab-discount');
+  if (!select) return;
+  
+  var currentVal = select.value;
+  select.innerHTML = '';
+  
+  var maxDiscount = (slabIdx < 2) ? 10 : 15;
+  var options = [0, 3, 5, 7, 10];
+  if (maxDiscount === 15) {
+    options.push(12, 15);
+  }
+  
+  options.forEach(function(val) {
+    var opt = document.createElement('option');
+    opt.value = val;
+    opt.textContent = val + '%';
+    if (val.toString() === currentVal) {
+      opt.selected = true;
+    }
+    select.appendChild(opt);
+  });
+  
+  if (parseInt(currentVal) > maxDiscount) {
+    select.value = maxDiscount.toString();
+  }
 }
 
 function update(){
@@ -4099,16 +4127,16 @@ function update(){
   var slabCapacity = isCustomEnterprise ? users : activeSlab.maxUsers;
   var slabStdPrice = activeSlab.price;
 
-  // 2. Manage Discount Visibility and State
-  // Basic and Starter slabs (indices 0 and 1) are not eligible for discounts
-  var isEligibleForDiscount = (slabIdx >= 2 || isCustomEnterprise);
-  if (!isEligibleForDiscount) {
-    g('ctrl-discount-wrap').style.display = 'none';
+  // 2. Manage Discount and Free Months Options
+  // Populate percentage discount options (Basic/Starter max 10%, Growth+ max 15%)
+  updateDiscountOptions(slabIdx);
+
+  // Free Months dropdown is visible only for Growth and above (slabIdx >= 2)
+  var isEligibleForFreeMonths = (slabIdx >= 2 || isCustomEnterprise);
+  if (!isEligibleForFreeMonths) {
     g('ctrl-free-months-wrap').style.display = 'none';
-    g('slab-discount').value = "0";
     g('slab-free-months').value = "0";
   } else {
-    g('ctrl-discount-wrap').style.display = '';
     g('ctrl-free-months-wrap').style.display = '';
   }
 
@@ -4116,12 +4144,9 @@ function update(){
   var freeMonths = parseInt(g('slab-free-months').value) || 0;
   var accessTerm = 12 + freeMonths;
 
-  // Apply default slab price on change if the price input is empty or has standard/discounted price matching the previous state
-  var basePrice = parseFloat(g('slab-price-input').value);
-  if (isNaN(basePrice)) {
-    basePrice = Math.round(slabStdPrice * (1 - discountPercent / 100));
-    g('slab-price-input').value = basePrice;
-  }
+  // Slab price is strictly locked: calculated standard price minus discount %
+  var basePrice = Math.round(slabStdPrice * (1 - discountPercent / 100));
+  g('slab-price-input').value = basePrice;
 
   var coreTotal = basePrice * 1.18;
   var nAmt = (proposalType === 'notice' || noticeOn) ? nFin : 0;
@@ -4151,7 +4176,7 @@ function update(){
       g('new-slab-active-u').textContent = users + ' Users';
       
       var buffer = slabCapacity - users;
-      g('new-slab-buffer').textContent = buffer >= 0 ? (buffer + ' seat' + (buffer !== 1 ? 's' : '') + ' free') : '0 seats free (limit exceeded)';
+      g('new-slab-buffer').textContent = buffer > 0 ? (buffer + ' seat' + (buffer !== 1 ? 's' : '') + ' (add staff at ₹0 cost)') : 'None (at capacity limit)';
       g('new-slab-buffer').style.color = buffer > 0 ? 'var(--green-mid)' : 'var(--text3)';
       
       if (freeMonths > 0) {
@@ -4166,17 +4191,7 @@ function update(){
       g('new-slab-gst').textContent = inr(basePrice * 0.18);
       g('new-slab-fin').textContent = inr(coreTotal);
 
-      // New Customer Savings Logic: compare to equivalent legacy Growth @ ₹200/mo
-      var legacyAnnual = users * 200 * 12;
-      var savings = legacyAnnual - basePrice;
-      var savingsPct = Math.round(savings / legacyAnnual * 100);
-      
-      if (savings > 0) {
-        g('new-slab-savings-box').style.display = '';
-        g('new-slab-savings-val').textContent = 'Save ' + inr(savings) + ' / yr (' + savingsPct + '% savings)';
-      } else {
-        g('new-slab-savings-box').style.display = 'none';
-      }
+      g('new-slab-savings-box').style.display = 'none';
 
     } else if (proposalType === 'migration') {
       g('card-new-slab').style.display = 'none';
@@ -4215,7 +4230,7 @@ function update(){
       g('mig-benefit-save').textContent = 'Save ' + inr(migSavings) + ' / year (' + migSavingsPct + '% direct cost reduction)';
 
       var migBuffer = slabCapacity - users;
-      g('mig-benefit-cap').textContent = '+' + migBuffer + ' additional buffer seat' + (migBuffer !== 1 ? 's' : '') + ' (upgraded from ' + users + ' to ' + slabCapacity + ' user limit)';
+      g('mig-benefit-cap').textContent = migBuffer > 0 ? ('+' + migBuffer + ' additional seat' + (migBuffer !== 1 ? 's' : '') + ' included (add staff anytime at ₹0 cost)') : 'None (at capacity limit)';
       
       if (legacyPlan === 'basic') {
         g('mig-benefit-feat').textContent = '100% access to all 23 modules, upgraded from restricted Basic plan';
