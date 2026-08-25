@@ -140,6 +140,62 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .plan-card.growth  .fc{background:var(--purple-bg);color:var(--purple-mid)}
 .plan-card.notice  .fc{background:#fef3c7;color:#d97706}
 
+details.feat-group {
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  background: white;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+details.feat-group summary {
+  padding: 10px 14px;
+  background: var(--bg2);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--text);
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+details.feat-group summary::-webkit-details-marker {
+  display: none;
+}
+details.feat-group summary::after {
+  content: '▼';
+  font-size: 8px;
+  color: var(--text3);
+}
+details.feat-group[open] summary::after {
+  content: '▲';
+}
+details.feat-group[open] summary {
+  border-bottom: 1px solid var(--border2);
+}
+details.feat-group ul {
+  padding: 14px;
+  margin: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+}
+details.feat-group ul li {
+  font-size: 11.5px;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+details.feat-group ul li .fc {
+  margin-top: 0;
+}
+
 /* ════════════════════════════════════════════
    COMPARE MODE
    ════════════════════════════════════════════ */
@@ -3566,31 +3622,41 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
         <div style="display:grid; grid-template-columns: 1.5fr 1fr; border-top:1px solid var(--purple-border);">
           <!-- LEFT: FEATURES -->
           <div style="padding:24px; border-right:1px solid var(--purple-border);">
-            <div class="feats-lbl" style="font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px;">Unified Feature Suite — All 23 Modules Included</div>
-            <ul class="feats-cols" style="list-style:none; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:8px 16px;">
-              <li><span class="fc">✓</span>Dashboards &amp; Analytics</li>
-              <li><span class="fc">✓</span>Client Management</li>
-              <li><span class="fc">✓</span>Tasks &amp; Workflow</li>
-              <li><span class="fc">✓</span>Invoice &amp; Billing</li>
-              <li><span class="fc">✓</span>Service Catalog</li>
-              <li><span class="fc">✓</span>DSC Register</li>
-              <li><span class="fc">✓</span>Licenses Tracker</li>
-              <li><span class="fc">✓</span>Password Vault</li>
-              <li><span class="fc">✓</span>Doc Inward-Outward</li>
-              <li><span class="fc">✓</span>Attendance &amp; Leave</li>
-              <li><span class="fc">✓</span>Leads &amp; Inquiries</li>
-              <li><span class="fc">✓</span>Client Portal</li>
-              <li><span class="fc">✓</span>WhatsApp Automation</li>
-              <li><span class="fc">✓</span>Email Integration</li>
-              <li><span class="fc">✓</span>Multi-Billing Org</li>
-              <li><span class="fc">✓</span>Sprint &amp; Resource Planner</li>
-              <li><span class="fc">✓</span>Reminders Manager</li>
-              <li><span class="fc">✓</span>Task Escalations</li>
-              <li><span class="fc">✓</span>Team Chat &amp; Bots</li>
-              <li><span class="fc">✓</span>Turia Compliance Calendar</li>
-              <li><span class="fc">✓</span>Personal &amp; Team Todos</li>
-              <li><span class="fc">✓</span>Geo-Location Tracking</li>
-            </ul>
+            <div class="feats-lbl" style="font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px;">Feature Modules Included (All Tiers)</div>
+            
+            <details class="feat-group" open>
+              <summary>📋 Core Workflow &amp; Practice Modules (12)</summary>
+              <ul>
+                <li><span class="fc">✓</span>Dashboards &amp; Analytics</li>
+                <li><span class="fc">✓</span>Client Management</li>
+                <li><span class="fc">✓</span>Tasks &amp; Workflow</li>
+                <li><span class="fc">✓</span>Invoice &amp; Billing</li>
+                <li><span class="fc">✓</span>Service Catalog</li>
+                <li><span class="fc">✓</span>DSC Register</li>
+                <li><span class="fc">✓</span>Licenses Tracker</li>
+                <li><span class="fc">✓</span>Password Vault</li>
+                <li><span class="fc">✓</span>Doc Inward-Outward</li>
+                <li><span class="fc">✓</span>Attendance &amp; Leave</li>
+                <li><span class="fc">✓</span>Leads &amp; Inquiries</li>
+                <li><span class="fc">✓</span>Client Portal</li>
+              </ul>
+            </details>
+
+            <details class="feat-group" open>
+              <summary>💎 Premium Automation &amp; Scale Modules (10)</summary>
+              <ul>
+                <li><span class="fc">✓</span>WhatsApp Automation</li>
+                <li><span class="fc">✓</span>Email Integration</li>
+                <li><span class="fc">✓</span>Multi-Billing Org</li>
+                <li><span class="fc">✓</span>Sprint &amp; Resource Planner</li>
+                <li><span class="fc">✓</span>Reminders Manager</li>
+                <li><span class="fc">✓</span>Task Escalations</li>
+                <li><span class="fc">✓</span>Team Chat &amp; Bots</li>
+                <li><span class="fc">✓</span>Turia Compliance Calendar</li>
+                <li><span class="fc">✓</span>Personal &amp; Team Todos</li>
+                <li><span class="fc">✓</span>Geo-Location Tracking</li>
+              </ul>
+            </details>
           </div>
           
           <!-- RIGHT: PRICING -->
