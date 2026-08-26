@@ -3653,8 +3653,8 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
                 <li><span class="fc">✓</span>Multi-Billing Org</li>
                 <li><span class="fc">✓</span>Sprint &amp; Resource Planner</li>
                 <li><span class="fc">✓</span>Reminders Manager</li>
-                <li><span class="fc">✓</span>Task Escalations</li>
-                <li><span class="fc">✓</span>Team Chat &amp; Bots</li>
+                <li><span class="fc">✓</span>Automation Agents</li>
+                <li><span class="fc">✓</span>Internal Team Chat</li>
                 <li><span class="fc">✓</span>Turia Compliance Calendar</li>
                 <li><span class="fc">✓</span>Personal &amp; Team Todos</li>
                 <li><span class="fc">✓</span>Geo-Location Tracking</li>
@@ -3672,6 +3672,9 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
               <span class="bc-sym">₹</span><span class="bc-num" id="new-slab-price">16,999</span>
             </div>
             <div class="bc-per" id="new-slab-term-desc">per year (GST exclusive)</div>
+            <div>
+              <div id="new-slab-user-rate-badge" style="display:inline-block; font-size:10px; font-weight:700; color:var(--purple-mid); background:var(--purple-bg); padding:2px 8px; border-radius:20px; margin-top:4px;">₹71/user/month</div>
+            </div>
             <div class="bc-div" style="margin:12px 0;"></div>
             
             <div class="bc-row"><span class="l">User Capacity</span><span class="r" id="new-slab-cap">Up to 20 Users</span></div>
@@ -3720,7 +3723,7 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
             <ul class="mig-benefit-list">
               <li>
                 <span class="fc" style="background:var(--teal-bg); color:var(--teal-dark)">✓</span>
-                <span><strong style="color:var(--text); display:block;">Direct Annual Base Savings</strong><span id="mig-benefit-save">Save ₹9,201.00 / year (48% direct cost reduction)</span></span>
+                <span><strong id="mig-benefit-save-title" style="color:var(--text); display:block;">Direct Annual Base Savings</strong><span id="mig-benefit-save">Save ₹9,201.00 / year (48% direct cost reduction)</span></span>
               </li>
               <li>
                 <span class="fc" style="background:var(--teal-bg); color:var(--teal-dark)">✓</span>
@@ -3728,7 +3731,7 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
               </li>
               <li>
                 <span class="fc" style="background:var(--teal-bg); color:var(--teal-dark)">✓</span>
-                <span><strong style="color:var(--text); display:block;">Full Feature Suite Unlocked</strong><span id="mig-benefit-feat">100% access to all 23 modules, with zero premium feature restrictions</span></span>
+                <span><strong id="mig-benefit-feat-title" style="color:var(--text); display:block;">Full Feature Suite Unlocked</strong><span id="mig-benefit-feat">100% access to all 22 modules, with zero premium feature restrictions</span></span>
               </li>
               <li>
                 <span class="fc" style="background:var(--teal-bg); color:var(--teal-dark)">✓</span>
@@ -3747,6 +3750,9 @@ exports.qrToImageData = function qrToImageData (imgData, qr, opts) {
               <span class="bc-sym" style="color:var(--teal-dark)">₹</span><span class="bc-num" id="mig-price" style="color:var(--teal-dark)">9,999</span>
             </div>
             <div class="bc-per" style="color:var(--teal-mid);" id="mig-term-desc">per year (GST exclusive)</div>
+            <div>
+              <div id="mig-user-rate-badge" style="display:inline-block; font-size:10px; font-weight:700; color:var(--teal-dark); background:var(--teal-bg); padding:2px 8px; border-radius:20px; margin-top:4px;">₹71/user/month</div>
+            </div>
             <div class="bc-div" style="margin:12px 0; border-top-color:var(--teal-mid);"></div>
             
             <div class="bc-row"><span class="l">New Slab Package</span><span class="r" id="mig-slab-name">Starter Slab</span></div>
@@ -4254,6 +4260,15 @@ function update(){
   var basePrice = Math.round(annualDiscountedPrice * (contractMonths / 12));
   g('slab-price-input').value = basePrice;
 
+  // Calculate dynamic per-user reference rate
+  var perUserRate = slabCapacity > 0 ? Math.round(basePrice / (contractMonths * slabCapacity)) : 0;
+  if (g('new-slab-user-rate-badge')) {
+    g('new-slab-user-rate-badge').textContent = '₹' + perUserRate + '/user/month';
+  }
+  if (g('mig-user-rate-badge')) {
+    g('mig-user-rate-badge').textContent = '₹' + perUserRate + '/user/month';
+  }
+
   var coreTotal = basePrice * 1.18;
   var nAmt = (proposalType === 'notice' || noticeOn) ? nFin : 0;
   var grand = (proposalType === 'notice') ? nFin : (coreTotal + (noticeOn ? nFin : 0));
@@ -4335,16 +4350,31 @@ function update(){
       // Benefit list computations
       var migSavings = legacyTermSpend - basePrice;
       var migSavingsPct = Math.round(migSavings / legacyTermSpend * 100);
-      g('mig-benefit-save').textContent = 'Save ' + inr(migSavings) + ' over ' + contractMonths + ' months (' + migSavingsPct + '% direct cost reduction)';
+
+      if (migSavings > 0) {
+        g('mig-benefit-save-title').textContent = (contractMonths === 12) ? 'Direct Annual Base Savings' : 'Direct Base Savings';
+        g('mig-benefit-save').textContent = 'Save ' + inr(migSavings) + ' over ' + contractMonths + ' months (' + migSavingsPct + '% direct cost reduction)';
+        
+        g('mig-benefit-feat-title').textContent = 'Full Feature Suite Unlocked';
+        if (legacyPlan === 'basic') {
+          g('mig-benefit-feat').textContent = '100% access to all 22 modules, upgraded from restricted Basic plan';
+        } else {
+          g('mig-benefit-feat').textContent = '100% access to all 22 modules, feature parity maintained';
+        }
+      } else {
+        g('mig-benefit-save-title').textContent = 'Full Product Access';
+        if (legacyPlan === 'basic') {
+          g('mig-benefit-save').textContent = 'Upgraded to all 22 practice modules, unlocking all 10 Premium automation features';
+        } else {
+          g('mig-benefit-save').textContent = 'Access the complete unified practice management suite with unlimited client records';
+        }
+        
+        g('mig-benefit-feat-title').textContent = 'Zero Per-Seat Billing Overhead';
+        g('mig-benefit-feat').textContent = 'Eliminates the complexity of monthly seat changes and tracking multiple invoices';
+      }
 
       var migBuffer = slabCapacity - users;
       g('mig-benefit-cap').textContent = migBuffer > 0 ? ('+' + migBuffer + ' additional seat' + (migBuffer !== 1 ? 's' : '') + ' included (add staff anytime at ₹0 cost)') : 'None (at capacity limit)';
-      
-      if (legacyPlan === 'basic') {
-        g('mig-benefit-feat').textContent = '100% access to all 23 modules, upgraded from restricted Basic plan';
-      } else {
-        g('mig-benefit-feat').textContent = '100% access to all 23 modules, feature parity maintained';
-      }
 
       if (migSavings > 0) {
         g('mig-savings-box').style.display = '';
@@ -4423,7 +4453,7 @@ function update(){
     g('ps-pname').textContent = 'Turia Practice License — ' + slabName + ' Slab (' + termLabelP + ')';
     
     var termAccessLabelP = (contractMonths === 12 && freeMonths === 0) ? '1 Year access' : (accessTerm + ' months access (' + contractMonths + ' months paid)');
-    g('ps-psub').textContent = 'Up to ' + slabCapacity + ' Team Members · All 23 modules · ' + termAccessLabelP;
+    g('ps-psub').textContent = 'Up to ' + slabCapacity + ' Team Members · All 22 modules · ' + termAccessLabelP;
     g('ps-pqty').textContent = '1';
     g('ps-prate').textContent = inr(basePrice);
     g('ps-pamt').textContent = inr(basePrice);
